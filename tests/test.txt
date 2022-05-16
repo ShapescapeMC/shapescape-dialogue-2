@@ -1,0 +1,40 @@
+settings: wpm=120 title_max=15
+camera:
+    10 10 10 90 0
+    5 5 5 90 0
+    time:
+        wait: time=1
+            /scorebard players set @a force 0
+            run_once:
+                /summon shapescape:obi_wan 1 2 3
+            schedule: time=100
+                /execute @a[type=shapescape:clone] ~ ~ ~  function order_66
+            on_exit:
+                /event entity @e[type=shapescape:obi_wan] remove_high_ground
+        tell: sound=starwars/obi_wan/hello.ogg
+            [Obi-Wan] Hello there!
+        tell: wpm=90 sound=starwars/grievous/general_kenobi.ogg
+            [Grevious] General Kenobi!
+            [this is just an example...] This is a multiline text.
+            loop: time=0.1
+                /playsound grievous.cough
+        title:
+            Bossfight!
+            /scoreboard players set @a force 100
+            run_once:
+                /music play bossfight
+        sound: sound=starwars/rd2d/beep_boop.ogg
+
+tell: [Grevious] You are a bold one.
+dialogue: label=BOLD_ONE
+    §oAnswer to General Grievous
+    dialogue_option: No I'm not
+        tell: [Grevious] Yes you are
+        goto: BOLD_ONE
+    dialogue_option: How dare you!
+        /kill @e[type=shapescape:obi_wan]
+    dialogue_option: No you!
+        /kill @e[type=shapescape:grevious]
+    dialogue_exit:
+        /say I hope we can detect exiting the dialogue...
+

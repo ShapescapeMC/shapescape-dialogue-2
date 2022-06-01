@@ -1,11 +1,11 @@
 settings: wpm=120 title_max=15
 sound_profiles:
-    obi_wan:
-        male: sounds=starwars/obi_wan/male
-        female: sounds=starwars/obi_wan/female
-    grevious:
-        male: sounds=starwars/grevious/male
-        female: sounds=starwars/grevious/apache_helicopter
+    male:
+        obi_wan: sound=starwars/obi_wan/male
+        grevious: sound=starwars/grevious/male
+    female:
+        obi_wan: sound=starwars/obi_wan/female
+        grevious: sound=starwars/grevious/apache_helicopter
 
 camera:
     10 10 10 90 0
@@ -28,9 +28,12 @@ camera:
                 /playsound grievous.cough
         title:
             Bossfight!
+            This is a subtitle.
             /scoreboard players set @a force 100
             run_once:
                 /music play bossfight
+        actionbar:
+            Objective: kill General Grevious
         blank: sound=starwars/rd2d/beep_boop.ogg
 
 ## tell: [Grevious] You are a bold one.

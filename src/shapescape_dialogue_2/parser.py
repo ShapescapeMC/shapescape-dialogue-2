@@ -9,7 +9,7 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import (
-    Any, Deque, List, Literal, NamedTuple, Optional, Union)
+    Any, Deque, List, Literal, NamedTuple, Optional, Tuple, Union)
 
 
 class ParseError(Exception):
@@ -23,14 +23,25 @@ class ParseError(Exception):
             f"Unexpected token type {token.token_type} at line "
             f"{token.line_number}. Expected one of:\n"
             +
-            f"\t- {t.descriptive_str()}\n" for t in expected
+            "".join(f"\t- {t.descriptive_str()}\n" for t in expected)
+        )
+
+    @staticmethod
+    def from_unexpected_token_value(
+            token: Token, *expected: TokenType) -> ParseError:
+        return ParseError(
+            f"Unexpected token value {token.value} of token type "
+            f"{token.token_type} at line "
+            f"{token.line_number}. Expected one of:\n"
+            +
+            "".join(f"\t- {t.descriptive_str()}\n" for t in expected)
         )
 
     @staticmethod
     def from_duplicate_token(token: Token, duplicate: Token) -> ParseError:
         return ParseError(
             f"Duplicate {token.token_type.descriptive_str()} at line "
-            f"{token.line_numbera} and line {duplicate.line_number}."
+            f"{token.line_number} and line {duplicate.line_number}."
         )
 
 class TokenType(Enum):
@@ -49,6 +60,7 @@ class TokenType(Enum):
     TELL = auto()
     LOOP = auto()
     TITLE = auto()
+    ACTIONBAR = auto()
     DIALOGUE = auto()
     DIALOGUE_OPTION = auto()
     DIALOGUE_EXIT = auto()
@@ -91,6 +103,8 @@ class TokenType(Enum):
             return '"loop:"'
         if self == TokenType.TITLE:
             return '"title:"'
+        if self == TokenType.ACTIONBAR:
+            return '"actionbar:"'
         if self == TokenType.DIALOGUE:
             return '"dialogue:"'
         if self == TokenType.DIALOGUE_OPTION:
@@ -127,7 +141,7 @@ class TokenType(Enum):
         return f"{self}"
 
 # Labels that can't be categorized by the tokenizer
-ArbitrailyNamedLabel = Literal[
+NamedLabelTokenType = Literal[
     TokenType.SOUND_PROFILE,
     TokenType.SOUND_PROFILE_VARIANT]
 
@@ -139,17 +153,64 @@ class Token(NamedTuple):
     value: Any
     line_number: int
 
-    def get_label_token(self, new_type: ArbitrailyNamedLabel) -> Token:
+    def to_named_label_token(
+            self, new_type: NamedLabelTokenType) -> NamedLabelToken:
         '''
-        If current token is a text token tries to return a token with same
-        properties but with different type (new_type, an arbitrarily named
-        label).
+        Validates and transforms to NamedLabelToken. It additionally changes
+        the token type to be more specific.
         '''
         if self.token_type != TokenType.TEXT:
             raise ParseError.from_unexpected_token(self, new_type)
-        return Token(new_type, self.value, self.line_number)
+        if not isinstance(self.value, str):
+            raise ParseError.from_unexpected_token_value(self, new_type)
+        return NamedLabelToken(new_type, self.value, self.line_number)
 
-SettingsList = List[Token]
+    def to_text_token(self) -> TextToken:
+        '''Validates and transforms to TextToken'''
+        if self.token_type != TokenType.TEXT:
+            raise ParseError.from_unexpected_token(self, TokenType.TEXT)
+        if not isinstance(self.value, str):
+            raise ParseError.from_unexpected_token_value(self, TokenType.TEXT)
+        return TextToken(self.token_type, self.value, self.line_number)
+
+    def to_settings_token(self) -> SettingToken:
+        '''Validates and transforms to SettingToken'''
+        if (
+                not isinstance(self.value, Setting) or
+                self.token_type != TokenType.SETTING):
+            raise ParseError(
+                f"Unable to convert token {self} to setting token "
+                f"at line {self.line_number}")
+        return SettingToken(*self)
+
+class SettingToken(Token):
+    '''
+    Specialized version of a Token created from Tokens with SETTING token
+    type (used for better type annotation)
+    '''
+    token_type: Literal[TokenType.SETTING]
+    value: Setting
+    line_number: int
+
+class NamedLabelToken(Token):
+    '''
+    NamedLabelToken is token for tokens that hold string value and represent
+    a label.
+    '''
+    token_type: NamedLabelTokenType
+    value: str
+    line_number: int
+
+class TextToken(Token):
+    '''
+    TextToken is a token for tokens that hold string value.
+    '''
+    token_type: Literal[TokenType.TEXT]
+    value: str
+    line_number: int
+
+
+SettingsList = List[SettingToken]
 
 # Token values
 class Setting(NamedTuple):
@@ -230,6 +291,7 @@ TOKENIZER = re.Scanner([  # type: ignore
     (r'tell:', lambda s, t: (TokenType.TELL, t)),
     (r'loop:', lambda s, t: (TokenType.LOOP, t)),
     (r'title:', lambda s, t: (TokenType.TITLE, t)),
+    (r'actionbar:', lambda s, t: (TokenType.ACTIONBAR, t)),
     (r'camera:', lambda s, t: (TokenType.CAMERA, t)),
     (r'run_once:', lambda s, t: (TokenType.RUN_ONCE, t)),
     (r'on_exit:', lambda s, t: (TokenType.ON_EXIT, t)),
@@ -332,7 +394,7 @@ def tokenize(source: List[str]) -> List[Token]:
 # AST builder
 @dataclass
 class RootAstNode:
-    timeline: List[Union[MessageNode, DialogueNode]]
+    timeline: List[Union[MessageNode, DialogueNode, CameraNode]]
     settings: Optional[SettingsNode] = None
     sound_profiles: Optional[SoundProfilesNode] = None
 
@@ -343,22 +405,28 @@ class RootAstNode:
         settings = None
         if token.token_type is TokenType.SETTINGS:
             settings = SettingsNode.from_token_stack(tokens)
+            token = tokens[0]
         # Sound profiles
         sound_profiles = None
-        if token.token_type is TokenType.SOUND_PROFILE:
+        if token.token_type is TokenType.SOUND_PROFILES:
             sound_profiles = SoundProfilesNode.from_token_stack(tokens)
+            token = tokens[0]
         # Timeline
-        timeline: List[Union[MessageNode, DialogueNode]] = []
+        timeline: List[Union[MessageNode, DialogueNode, CameraNode]] = []
         while token.token_type is not TokenType.EOF:
             if token.token_type in (
-                    TokenType.TELL, TokenType.TITLE, TokenType.BLANK):
+                    TokenType.TELL, TokenType.TITLE, TokenType.ACTIONBAR,
+                    TokenType.BLANK):
                 timeline.append(MessageNode.from_token_stack(tokens))
             elif token.token_type is TokenType.DIALOGUE:
                 raise NotImplementedError()
+            elif token.token_type is TokenType.CAMERA:
+                timeline.append(CameraNode.from_token_stack(tokens))
             else:
                 raise ParseError.from_unexpected_token(
                     token, TokenType.TELL, TokenType.BLANK, TokenType.TITLE,
-                    TokenType.DIALOGUE, TokenType.EOF)
+                    TokenType.ACTIONBAR, TokenType.DIALOGUE, TokenType.EOF)
+            token = tokens[0]
         return RootAstNode(timeline, settings, sound_profiles)
 
 @dataclass
@@ -382,7 +450,7 @@ class SettingsNode:
         token = tokens[0]
         settings: SettingsList = []
         while token.token_type is TokenType.SETTING:
-            settings.append(tokens.popleft())
+            settings.append(tokens.popleft().to_settings_token())
             token = tokens[0]
         return settings
 
@@ -395,11 +463,11 @@ class SoundProfilesNode:
         if token.token_type is not TokenType.SOUND_PROFILES:
             raise ParseError.from_unexpected_token(
                 token, TokenType.SOUND_PROFILES)
-        token = tokens[0]
         # Expect indentation or finish parsing message node
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return SoundProfilesNode([])
         sound_profiles: List[SoundProfileNode] = []
@@ -416,17 +484,18 @@ class SoundProfilesNode:
 
 @dataclass
 class SoundProfileNode:
-    name: Token
+    name: NamedLabelToken
     sound_profile_variant: List[SoundProfileVariant]
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SoundProfileNode:
         token = tokens.popleft()
-        token = token.get_label_token(TokenType.SOUND_PROFILE)
+        token = token.to_named_label_token(TokenType.SOUND_PROFILE)
         name = token
         # Expect indentation or finish parsing message node
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return SoundProfileNode(name, [])
         sound_profile_variant: List[SoundProfileVariant] = []
@@ -444,56 +513,64 @@ class SoundProfileNode:
 
 @dataclass
 class SoundProfileVariant:
-    name: Token
+    name: NamedLabelToken
     settings: SettingsList
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SoundProfileVariant:
         token = tokens.popleft()
-        token = token.get_label_token(TokenType.SOUND_PROFILE_VARIANT)
+        token = token.to_named_label_token(TokenType.SOUND_PROFILE_VARIANT)
         name = token
         settings = SettingsNode.parse_settings(tokens)
         return SoundProfileVariant(name, settings)
 
 @dataclass
 class MessageNode:
-    node_type: Literal["tell", "blank", "title"]
+    node_type: Literal["tell", "blank", "title", "actionbar"]
     text_nodes: List[TextNode]
     command_nodes: List[CommandNode]
     schedule_nodes: List[ScheduleNode]
     settings: SettingsList
+    loop_nodes: List[LoopNode]
     run_once_node: Optional[RunOnceNode] = None
     on_exit_node: Optional[OnExitNode] = None
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> MessageNode:
         token = tokens.popleft()
-        node_type: Literal["tell", "blank", "title"]
+        node_type: Literal["tell", "blank", "title", "actionbar"]
         if token.token_type is TokenType.TELL:
             node_type = "tell"
+        elif token.token_type is TokenType.ACTIONBAR:
+            node_type = "actionbar"
         elif token.token_type is TokenType.BLANK:
             node_type = "blank"
         elif token.token_type is TokenType.TITLE:
             node_type = "title"
         else:
             raise ParseError.from_unexpected_token(
-                token, TokenType.TELL, TokenType.BLANK, TokenType.TITLE)
+                token, TokenType.TELL, TokenType.ACTIONBAR, TokenType.BLANK,
+                TokenType.TITLE)
+        token = tokens[0]
         # Settings
         settings: SettingsList = []
-        if token.token_type is TokenType.SETTINGS:
+        if token.token_type is TokenType.SETTING:
             settings = SettingsNode.parse_settings(tokens)
+            token = tokens[0]
         # Expect indentation or finish parsing message node
-        token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
-            return MessageNode(node_type, [], [], [], settings)
+            return MessageNode(node_type, [], [], [], settings, [])
         # Text nodes
         text_nodes = []
         token = tokens[0]
-        if node_type != 'blank':  # Blank nodes don't accept text
-            while token.token_type is TokenType.TEXT:
-                text_nodes.append(TextNode.from_token_stack(tokens))
-                token = tokens[0]
+        while token.token_type is TokenType.TEXT:
+            if node_type == "blank":  # Blank node can't have text
+                raise ParseError.from_unexpected_token(
+                    token, TokenType.TEXT)
+            text_nodes.append(TextNode.from_token_stack(tokens))
+            token = tokens[0]
         # Command nodes
         command_nodes = []
         while token.token_type is TokenType.COMMAND:
@@ -505,8 +582,10 @@ class MessageNode:
         on_exit_node: Optional[OnExitNode] = None
         registered_exit_token: Optional[Token] = None  # used for errors
         schedule_nodes: List[ScheduleNode] = []
+        loop_nodes: List[LoopNode] = []
         while token.token_type in (
-                TokenType.SCHEDULE, TokenType.RUN_ONCE, TokenType.ON_EXIT):
+                TokenType.SCHEDULE, TokenType.RUN_ONCE, TokenType.ON_EXIT,
+                TokenType.LOOP):
             # Run once node
             if token.token_type is TokenType.RUN_ONCE:
                 if registered_run_once_token is not None:
@@ -524,15 +603,16 @@ class MessageNode:
             # Shedule nodes
             if token.token_type is TokenType.SCHEDULE:
                 schedule_nodes.append(ScheduleNode.from_token_stack(tokens))
+            # Loop nodes
+            if token.token_type is TokenType.LOOP:
+                loop_nodes.append(LoopNode.from_token_stack(tokens))
+            token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
-            raise ParseError.from_unexpected_token(
-                token, TokenType.DEDENT, TokenType.EOF)
         return MessageNode(
             node_type, text_nodes, command_nodes, schedule_nodes, settings,
-            run_once_node, on_exit_node)
+            loop_nodes, run_once_node, on_exit_node)
 
 
 @dataclass
@@ -566,12 +646,13 @@ class CameraNode:
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return CameraNode([], None)
         # Coordinates
         coordinates = []
         token = tokens[0]
-        while token.token_type is (
+        while token.token_type in (
                 TokenType.COORDINATES_ROTATED,
                 TokenType.COORDINATES_FACING_COORDINATES,
                 TokenType.COORDINATES_FACING_ENTITY):
@@ -581,12 +662,10 @@ class CameraNode:
         time: Optional[TimeNode] = None
         if token.token_type is TokenType.TIME:
             time = TimeNode.from_token_stack(tokens)
+            token = tokens[0]
         # Expecte DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
-            raise ParseError.from_unexpected_token(
-                token, TokenType.DEDENT, TokenType.EOF)
         return CameraNode(coordinates, time)
 
 @dataclass
@@ -600,29 +679,28 @@ class TimeNode:
         if token.token_type is not TokenType.TIME:
             raise ParseError.from_unexpected_token(
                 token, TokenType.TIME)
+        token = tokens[0]
         # Settings
         settings: SettingsList = []
         if token.token_type is TokenType.SETTINGS:
             settings = SettingsNode.parse_settings(tokens)
+            token = tokens[0]
         # Expect indentation or finish parsing time node
-        token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return TimeNode(settings, [])
         # Message nodes
         messages: List[MessageNode] = []
-        token = tokens[0]
         while token.token_type in (
-                TokenType.TELL, TokenType.TITLE, TokenType.BLANK):
+                TokenType.TELL, TokenType.TITLE, TokenType.BLANK,
+                TokenType.ACTIONBAR):
             messages.append(MessageNode.from_token_stack(tokens))
             token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        elif token.token_type is not TokenType.EOF:
-            raise ParseError.from_unexpected_token(
-                token, TokenType.DEDENT, TokenType.EOF)
         return TimeNode(settings, messages)
 
 @dataclass
@@ -641,14 +719,14 @@ class CoordinateNode:
 
 @dataclass
 class TextNode:
-    text: Token
+    text: TextToken
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> TextNode:
         token = tokens.popleft()
         if token.token_type is not TokenType.TEXT:
             raise ParseError.from_unexpected_token(
                 token, TokenType.TEXT)
-        return TextNode(token)
+        return TextNode(token.to_text_token())
 
 @dataclass
 class CommandNode:
@@ -674,6 +752,7 @@ class RunOnceNode:
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return RunOnceNode([])
         # Command nodes
@@ -693,18 +772,26 @@ class RunOnceNode:
 @dataclass
 class ScheduleNode:
     command_nodes: List[CommandNode]
+    settings: SettingsList
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> ScheduleNode:
         token = tokens.popleft()
         if token.token_type is not TokenType.SCHEDULE:
             raise ParseError.from_unexpected_token(
                 token, TokenType.SCHEDULE)
-        # Expect indentation or finish parsing schedule node
         token = tokens[0]
+        # Settings
+        settings: SettingsList = []
+        if token.token_type is TokenType.SETTING:
+            settings = SettingsNode.parse_settings(tokens)
+            token = tokens[0]
+        # Expect indentation or finish parsing schedule node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
-            return ScheduleNode([])
+            return ScheduleNode([], [])
         # Command nodes
         command_nodes = []
         token = tokens[0]
@@ -717,7 +804,7 @@ class ScheduleNode:
         elif token.token_type is not TokenType.EOF:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return ScheduleNode(command_nodes)
+        return ScheduleNode(command_nodes, settings)
 
 @dataclass
 class OnExitNode:
@@ -728,10 +815,11 @@ class OnExitNode:
         if token.token_type is not TokenType.ON_EXIT:
             raise ParseError.from_unexpected_token(
                 token, TokenType.ON_EXIT)
-        # Expect indentation or finish parsing on exit node
         token = tokens[0]
+        # Expect indentation or finish parsing on exit node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
+            token = tokens[0]
         else:
             return OnExitNode([])
         # Command nodes
@@ -747,6 +835,43 @@ class OnExitNode:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
         return OnExitNode(command_nodes)
+
+@dataclass
+class LoopNode:
+    command_nodes: List[CommandNode]
+    settings: SettingsList
+
+    @staticmethod
+    def from_token_stack(tokens: Deque[Token]) -> LoopNode:
+        token = tokens.popleft()
+        if token.token_type is not TokenType.LOOP:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.LOOP)
+        token = tokens[0]
+        # Settings
+        settings: SettingsList = []
+        if token.token_type is TokenType.SETTING:
+            settings = SettingsNode.parse_settings(tokens)
+            token = tokens[0]
+        # Expect indentation or finish parsing run once node
+        if token.token_type == TokenType.INDENT:
+            tokens.popleft()
+            token = tokens[0]
+        else:
+            return LoopNode([], settings)
+        # Command nodes
+        command_nodes = []
+        token = tokens[0]
+        while token.token_type is TokenType.COMMAND:
+            command_nodes.append(CommandNode.from_token_stack(tokens))
+            token = tokens[0]
+        # Expect DEDENT or EOF, don't pop EOF
+        if token.token_type is TokenType.DEDENT:
+            tokens.popleft()
+        elif token.token_type is not TokenType.EOF:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.DEDENT, TokenType.EOF)
+        return LoopNode(command_nodes, settings)
 
 
 # The main AST builder function

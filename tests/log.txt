@@ -1,77 +1,774 @@
 Token(token_type=<TokenType.SETTINGS: 4>, value='settings:', line_number=1)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='wpm', value='120'), line_number=1)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='title_max', value='15'), line_number=1)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='wpm', value='120'), line_number=1)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='title_max', value='15'), line_number=1)
 Token(token_type=<TokenType.SOUND_PROFILES: 5>, value='sound_profiles:', line_number=2)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=3)
-Token(token_type=<TokenType.TEXT: 27>, value='obi_wan:', line_number=3)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='male', line_number=3)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=4)
-Token(token_type=<TokenType.TEXT: 27>, value='male: sounds=starwars/obi_wan/male', line_number=4)
-Token(token_type=<TokenType.TEXT: 27>, value='female: sounds=starwars/obi_wan/female', line_number=5)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='obi_wan', line_number=4)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='starwars/obi_wan/male'), line_number=4)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='grevious', line_number=5)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='starwars/grevious/male'), line_number=5)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=6)
-Token(token_type=<TokenType.TEXT: 27>, value='grevious:', line_number=6)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='female', line_number=6)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=7)
-Token(token_type=<TokenType.TEXT: 27>, value='male: sounds=starwars/grevious/male', line_number=7)
-Token(token_type=<TokenType.TEXT: 27>, value='female: sounds=starwars/grevious/apache_helicopter', line_number=8)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='obi_wan', line_number=7)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='starwars/obi_wan/female'), line_number=7)
+Token(token_type=<TokenType.NAMED_LABEL: 20>, value='grevious', line_number=8)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='starwars/grevious/apache_helicopter'), line_number=8)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=10)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=10)
 Token(token_type=<TokenType.CAMERA: 17>, value='camera:', line_number=10)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=11)
-Token(token_type=<TokenType.COORDINATES_ROTATED: 23>, value=Coordinates(x=10.0, y=10.0, z=10.0, y_rot=90.0, x_rot=0.0), line_number=11)
-Token(token_type=<TokenType.COORDINATES_ROTATED: 23>, value=Coordinates(x=5.0, y=5.0, z=5.0, y_rot=90.0, x_rot=0.0), line_number=12)
+Token(token_type=<TokenType.COORDINATES_ROTATED: 22>, value=CoordinatesRotated(x=10.0, y=10.0, z=10.0, y_rot=90.0, x_rot=0.0), line_number=11)
+Token(token_type=<TokenType.COORDINATES_ROTATED: 22>, value=CoordinatesRotated(x=5.0, y=5.0, z=5.0, y_rot=90.0, x_rot=0.0), line_number=12)
 Token(token_type=<TokenType.TIME: 6>, value='time:', line_number=13)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=14)
 Token(token_type=<TokenType.BLANK: 7>, value='blank:', line_number=14)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='1'), line_number=14)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='time', value='1'), line_number=14)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=15)
-Token(token_type=<TokenType.COMMAND: 26>, value='scorebard players set @a force 0', line_number=15)
+Token(token_type=<TokenType.COMMAND: 25>, value='scorebard players set @a force 0', line_number=15)
 Token(token_type=<TokenType.RUN_ONCE: 18>, value='run_once:', line_number=16)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=17)
-Token(token_type=<TokenType.COMMAND: 26>, value='summon shapescape:obi_wan 1 2 3', line_number=17)
+Token(token_type=<TokenType.COMMAND: 25>, value='summon shapescape:obi_wan 1 2 3', line_number=17)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=18)
 Token(token_type=<TokenType.SCHEDULE: 8>, value='schedule:', line_number=18)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='100'), line_number=18)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='time', value='100'), line_number=18)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=19)
-Token(token_type=<TokenType.COMMAND: 26>, value='execute @a[type=shapescape:clone] ~ ~ ~  function order_66', line_number=19)
+Token(token_type=<TokenType.COMMAND: 25>, value='execute @a[type=shapescape:clone] ~ ~ ~  function order_66', line_number=19)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=20)
 Token(token_type=<TokenType.ON_EXIT: 19>, value='on_exit:', line_number=20)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=21)
-Token(token_type=<TokenType.COMMAND: 26>, value='event entity @e[type=shapescape:obi_wan] remove_high_ground', line_number=21)
+Token(token_type=<TokenType.COMMAND: 25>, value='event entity @e[type=shapescape:obi_wan] remove_high_ground', line_number=21)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=22)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=22)
 Token(token_type=<TokenType.TELL: 10>, value='tell:', line_number=22)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='obi_wan:hello.ogg'), line_number=22)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='obi_wan:hello.ogg'), line_number=22)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=23)
-Token(token_type=<TokenType.TEXT: 27>, value='[Obi-Wan] Hello there!', line_number=23)
+Token(token_type=<TokenType.TEXT: 26>, value='[Obi-Wan] Hello there!', line_number=23)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=24)
 Token(token_type=<TokenType.TELL: 10>, value='tell:', line_number=24)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='wpm', value='90'), line_number=24)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='grievous:general_kenobi.ogg'), line_number=24)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='wpm', value='90'), line_number=24)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='grievous:general_kenobi.ogg'), line_number=24)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=25)
-Token(token_type=<TokenType.TEXT: 27>, value='[Grevious] General Kenobi!', line_number=25)
-Token(token_type=<TokenType.TEXT: 27>, value='[this is just an example...] This is a multiline text.', line_number=26)
+Token(token_type=<TokenType.TEXT: 26>, value='[Grevious] General Kenobi!', line_number=25)
+Token(token_type=<TokenType.TEXT: 26>, value='[this is just an example...] This is a multiline text.', line_number=26)
 Token(token_type=<TokenType.LOOP: 11>, value='loop:', line_number=27)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='0.1'), line_number=27)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='time', value='0.1'), line_number=27)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=28)
-Token(token_type=<TokenType.COMMAND: 26>, value='playsound grievous.cough', line_number=28)
+Token(token_type=<TokenType.COMMAND: 25>, value='playsound grievous.cough', line_number=28)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=29)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=29)
 Token(token_type=<TokenType.TITLE: 12>, value='title:', line_number=29)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=30)
-Token(token_type=<TokenType.TEXT: 27>, value='Bossfight!', line_number=30)
-Token(token_type=<TokenType.TEXT: 27>, value='This is a subtitle.', line_number=31)
-Token(token_type=<TokenType.COMMAND: 26>, value='scoreboard players set @a force 100', line_number=32)
+Token(token_type=<TokenType.TEXT: 26>, value='Bossfight!', line_number=30)
+Token(token_type=<TokenType.TEXT: 26>, value='This is a subtitle.', line_number=31)
+Token(token_type=<TokenType.COMMAND: 25>, value='scoreboard players set @a force 100', line_number=32)
 Token(token_type=<TokenType.RUN_ONCE: 18>, value='run_once:', line_number=33)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=34)
-Token(token_type=<TokenType.COMMAND: 26>, value='music play bossfight', line_number=34)
+Token(token_type=<TokenType.COMMAND: 25>, value='music play bossfight', line_number=34)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=35)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=35)
 Token(token_type=<TokenType.ACTIONBAR: 13>, value='actionbar:', line_number=35)
 Token(token_type=<TokenType.INDENT: 1>, value=None, line_number=36)
-Token(token_type=<TokenType.TEXT: 27>, value='Objective: kill General Grevious', line_number=36)
+Token(token_type=<TokenType.TEXT: 26>, value='Objective: kill General Grevious', line_number=36)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=37)
 Token(token_type=<TokenType.BLANK: 7>, value='blank:', line_number=37)
-Token(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='starwars/rd2d/beep_boop.ogg'), line_number=37)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='sound', value='starwars/rd2d/beep_boop.ogg'), line_number=37)
+Token(token_type=<TokenType.SETTING: 21>, value=Setting(name='time', value='1'), line_number=37)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=39)
 Token(token_type=<TokenType.DEDENT: 2>, value=None, line_number=39)
 Token(token_type=<TokenType.EOF: 3>, value=None, line_number=53)
-RootAstNode(timeline=[CameraNode(coordinates=[CoordinateNode(coordinates=Token(token_type=<TokenType.COORDINATES_ROTATED: 23>, value=Coordinates(x=10.0, y=10.0, z=10.0, y_rot=90.0, x_rot=0.0), line_number=11)), CoordinateNode(coordinates=Token(token_type=<TokenType.COORDINATES_ROTATED: 23>, value=Coordinates(x=5.0, y=5.0, z=5.0, y_rot=90.0, x_rot=0.0), line_number=12))], time=TimeNode(settings=[], messages=[MessageNode(node_type='blank', text_nodes=[], command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='scorebard players set @a force 0', line_number=15))], schedule_nodes=[ScheduleNode(command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='execute @a[type=shapescape:clone] ~ ~ ~  function order_66', line_number=19))], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='100'), line_number=18)])], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='1'), line_number=14)], loop_nodes=[], run_once_node=RunOnceNode(command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='summon shapescape:obi_wan 1 2 3', line_number=17))]), on_exit_node=OnExitNode(command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='event entity @e[type=shapescape:obi_wan] remove_high_ground', line_number=21))])), MessageNode(node_type='tell', text_nodes=[TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='[Obi-Wan] Hello there!', line_number=23))], command_nodes=[], schedule_nodes=[], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='obi_wan:hello.ogg'), line_number=22)], loop_nodes=[], run_once_node=None, on_exit_node=None), MessageNode(node_type='tell', text_nodes=[TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='[Grevious] General Kenobi!', line_number=25)), TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='[this is just an example...] This is a multiline text.', line_number=26))], command_nodes=[], schedule_nodes=[], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='wpm', value='90'), line_number=24), SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='grievous:general_kenobi.ogg'), line_number=24)], loop_nodes=[LoopNode(command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='playsound grievous.cough', line_number=28))], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='time', value='0.1'), line_number=27)])], run_once_node=None, on_exit_node=None), MessageNode(node_type='title', text_nodes=[TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='Bossfight!', line_number=30)), TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='This is a subtitle.', line_number=31))], command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='scoreboard players set @a force 100', line_number=32))], schedule_nodes=[], settings=[], loop_nodes=[], run_once_node=RunOnceNode(command_nodes=[CommandNode(command=Token(token_type=<TokenType.COMMAND: 26>, value='music play bossfight', line_number=34))]), on_exit_node=None), MessageNode(node_type='actionbar', text_nodes=[TextNode(text=Token(token_type=<TokenType.TEXT: 27>, value='Objective: kill General Grevious', line_number=36))], command_nodes=[], schedule_nodes=[], settings=[], loop_nodes=[], run_once_node=None, on_exit_node=None), MessageNode(node_type='blank', text_nodes=[], command_nodes=[], schedule_nodes=[], settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='sound', value='starwars/rd2d/beep_boop.ogg'), line_number=37)], loop_nodes=[], run_once_node=None, on_exit_node=None)]))], settings=SettingsNode(settings=[SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='wpm', value='120'), line_number=1), SettingToken(token_type=<TokenType.SETTING: 22>, value=Setting(name='title_max', value='15'), line_number=1)]), sound_profiles=SoundProfilesNode(sound_profiles=[SoundProfileNode(name=Token(token_type=<TokenType.SOUND_PROFILE: 20>, value='obi_wan:', line_number=3), sound_profile_variant=[SoundProfileVariant(name=Token(token_type=<TokenType.SOUND_PROFILE_VARIANT: 21>, value='male: sounds=starwars/obi_wan/male', line_number=4), settings=[]), SoundProfileVariant(name=Token(token_type=<TokenType.SOUND_PROFILE_VARIANT: 21>, value='female: sounds=starwars/obi_wan/female', line_number=5), settings=[])]), SoundProfileNode(name=Token(token_type=<TokenType.SOUND_PROFILE: 20>, value='grevious:', line_number=6), sound_profile_variant=[SoundProfileVariant(name=Token(token_type=<TokenType.SOUND_PROFILE_VARIANT: 21>, value='male: sounds=starwars/grevious/male', line_number=7), settings=[]), SoundProfileVariant(name=Token(token_type=<TokenType.SOUND_PROFILE_VARIANT: 21>, value='female: sounds=starwars/grevious/apache_helicopter', line_number=8), settings=[])])]))
+
+
+
+
+
+shapescape_dialogue_2.parser.RootAstNode(
+    timeline=[
+        shapescape_dialogue_2.parser.CameraNode(
+            coordinates=[
+                shapescape_dialogue_2.parser.CoordinateNode(
+                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
+                        x=10.0,
+                        y=10.0,
+                        z=10.0,
+                        y_rot=90.0,
+                        x_rot=0.0
+                    ),
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
+                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
+                            x=10.0,
+                            y=10.0,
+                            z=10.0,
+                            y_rot=90.0,
+                            x_rot=0.0
+                        ),
+                        line_number=11
+                    )
+                ),
+                shapescape_dialogue_2.parser.CoordinateNode(
+                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
+                        x=5.0,
+                        y=5.0,
+                        z=5.0,
+                        y_rot=90.0,
+                        x_rot=0.0
+                    ),
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
+                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
+                            x=5.0,
+                            y=5.0,
+                            z=5.0,
+                            y_rot=90.0,
+                            x_rot=0.0
+                        ),
+                        line_number=12
+                    )
+                )
+            ],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.CAMERA,
+                value='camera:',
+                line_number=10
+            ),
+            time=shapescape_dialogue_2.parser.TimeNode(
+                settings=[],
+                messages=[
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='blank',
+                        text_nodes=[],
+                        command_nodes=[
+                            shapescape_dialogue_2.parser.CommandNode(
+                                text='scorebard players set @a force 0',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                    value='scorebard players set @a force 0',
+                                    line_number=15
+                                )
+                            )
+                        ],
+                        schedule_nodes=[
+                            shapescape_dialogue_2.parser.ScheduleNode(
+                                command_nodes=[
+                                    shapescape_dialogue_2.parser.CommandNode(
+                                        text='execute @a[type=shapescape:clone] ~ '
+                                            '~ ~  function order_66',
+                                        token=shapescape_dialogue_2.parser.Token(
+                                            token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                            value='execute '
+                                                '@a[type=shapescape:clone] ~ ~ ~  '
+                                                'function order_66',
+                                            line_number=19
+                                        )
+                                    )
+                                ],
+                                settings=[
+                                    shapescape_dialogue_2.parser.SettingNode(
+                                        name='time',
+                                        value='100',
+                                        token=shapescape_dialogue_2.parser.Token(
+                                            token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                            value=shapescape_dialogue_2.parser.Setting(
+                                                name='time',
+                                                value='100'
+                                            ),
+                                            line_number=18
+                                        )
+                                    )
+                                ],
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SCHEDULE,
+                                    value='schedule:',
+                                    line_number=18
+                                )
+                            )
+                        ],
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='time',
+                                value='1',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='time',
+                                        value='1'
+                                    ),
+                                    line_number=14
+                                )
+                            )
+                        ],
+                        loop_nodes=[],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
+                            value='blank:',
+                            line_number=14
+                        ),
+                        run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
+                            command_nodes=[
+                                shapescape_dialogue_2.parser.CommandNode(
+                                    text='summon shapescape:obi_wan 1 2 3',
+                                    token=shapescape_dialogue_2.parser.Token(
+                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                        value='summon shapescape:obi_wan 1 2 3',
+                                        line_number=17
+                                    )
+                                )
+                            ],
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
+                                value='run_once:',
+                                line_number=16
+                            )
+                        ),
+                        on_exit_node=shapescape_dialogue_2.parser.OnExitNode(
+                            command_nodes=[
+                                shapescape_dialogue_2.parser.CommandNode(
+                                    text='event entity @e[type=shapescape:obi_wan] '
+                                        'remove_high_ground',
+                                    token=shapescape_dialogue_2.parser.Token(
+                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                        value='event entity '
+                                            '@e[type=shapescape:obi_wan] '
+                                            'remove_high_ground',
+                                        line_number=21
+                                    )
+                                )
+                            ],
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.ON_EXIT,
+                                value='on_exit:',
+                                line_number=20
+                            )
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='tell',
+                        text_nodes=[
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='[Obi-Wan] Hello there!',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='[Obi-Wan] Hello there!',
+                                    line_number=23
+                                )
+                            )
+                        ],
+                        command_nodes=[],
+                        schedule_nodes=[],
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='obi_wan:hello.ogg',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='obi_wan:hello.ogg'
+                                    ),
+                                    line_number=22
+                                )
+                            )
+                        ],
+                        loop_nodes=[],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.TELL,
+                            value='tell:',
+                            line_number=22
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='tell',
+                        text_nodes=[
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='[Grevious] General Kenobi!',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='[Grevious] General Kenobi!',
+                                    line_number=25
+                                )
+                            ),
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='[this is just an example...] This is a '
+                                    'multiline text.',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='[this is just an example...] This is a '
+                                        'multiline text.',
+                                    line_number=26
+                                )
+                            )
+                        ],
+                        command_nodes=[],
+                        schedule_nodes=[],
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='wpm',
+                                value='90',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='wpm',
+                                        value='90'
+                                    ),
+                                    line_number=24
+                                )
+                            ),
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='grievous:general_kenobi.ogg',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='grievous:general_kenobi.ogg'
+                                    ),
+                                    line_number=24
+                                )
+                            )
+                        ],
+                        loop_nodes=[
+                            shapescape_dialogue_2.parser.LoopNode(
+                                command_nodes=[
+                                    shapescape_dialogue_2.parser.CommandNode(
+                                        text='playsound grievous.cough',
+                                        token=shapescape_dialogue_2.parser.Token(
+                                            token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                            value='playsound grievous.cough',
+                                            line_number=28
+                                        )
+                                    )
+                                ],
+                                settings=[
+                                    shapescape_dialogue_2.parser.SettingNode(
+                                        name='time',
+                                        value='0.1',
+                                        token=shapescape_dialogue_2.parser.Token(
+                                            token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                            value=shapescape_dialogue_2.parser.Setting(
+                                                name='time',
+                                                value='0.1'
+                                            ),
+                                            line_number=27
+                                        )
+                                    )
+                                ],
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.LOOP,
+                                    value='loop:',
+                                    line_number=27
+                                )
+                            )
+                        ],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.TELL,
+                            value='tell:',
+                            line_number=24
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='title',
+                        text_nodes=[
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='Bossfight!',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='Bossfight!',
+                                    line_number=30
+                                )
+                            ),
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='This is a subtitle.',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='This is a subtitle.',
+                                    line_number=31
+                                )
+                            )
+                        ],
+                        command_nodes=[
+                            shapescape_dialogue_2.parser.CommandNode(
+                                text='scoreboard players set @a force 100',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                    value='scoreboard players set @a force 100',
+                                    line_number=32
+                                )
+                            )
+                        ],
+                        schedule_nodes=[],
+                        settings=[],
+                        loop_nodes=[],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.TITLE,
+                            value='title:',
+                            line_number=29
+                        ),
+                        run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
+                            command_nodes=[
+                                shapescape_dialogue_2.parser.CommandNode(
+                                    text='music play bossfight',
+                                    token=shapescape_dialogue_2.parser.Token(
+                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
+                                        value='music play bossfight',
+                                        line_number=34
+                                    )
+                                )
+                            ],
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
+                                value='run_once:',
+                                line_number=33
+                            )
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='actionbar',
+                        text_nodes=[
+                            shapescape_dialogue_2.parser.TextNode(
+                                text='Objective: kill General Grevious',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                                    value='Objective: kill General Grevious',
+                                    line_number=36
+                                )
+                            )
+                        ],
+                        command_nodes=[],
+                        schedule_nodes=[],
+                        settings=[],
+                        loop_nodes=[],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                            value='actionbar:',
+                            line_number=35
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.MessageNode(
+                        node_type='blank',
+                        text_nodes=[],
+                        command_nodes=[],
+                        schedule_nodes=[],
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='starwars/rd2d/beep_boop.ogg',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='starwars/rd2d/beep_boop.ogg'
+                                    ),
+                                    line_number=37
+                                )
+                            ),
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='time',
+                                value='1',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='time',
+                                        value='1'
+                                    ),
+                                    line_number=37
+                                )
+                            )
+                        ],
+                        loop_nodes=[],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
+                            value='blank:',
+                            line_number=37
+                        )
+                    )
+                ],
+                token=shapescape_dialogue_2.parser.Token(
+                    token_type=shapescape_dialogue_2.parser.TokenType.TIME,
+                    value='time:',
+                    line_number=13
+                )
+            )
+        )
+    ],
+    settings=shapescape_dialogue_2.parser.SettingsNode(
+        settings=[
+            shapescape_dialogue_2.parser.SettingNode(
+                name='wpm',
+                value='120',
+                token=shapescape_dialogue_2.parser.Token(
+                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                    value=shapescape_dialogue_2.parser.Setting(
+                        name='wpm',
+                        value='120'
+                    ),
+                    line_number=1
+                )
+            ),
+            shapescape_dialogue_2.parser.SettingNode(
+                name='title_max',
+                value='15',
+                token=shapescape_dialogue_2.parser.Token(
+                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                    value=shapescape_dialogue_2.parser.Setting(
+                        name='title_max',
+                        value='15'
+                    ),
+                    line_number=1
+                )
+            )
+        ],
+        token=shapescape_dialogue_2.parser.Token(
+            token_type=shapescape_dialogue_2.parser.TokenType.SETTINGS,
+            value='settings:',
+            line_number=1
+        )
+    ),
+    sound_profiles=shapescape_dialogue_2.parser.SoundProfilesNode(
+        sound_profiles=[
+            shapescape_dialogue_2.parser.SoundProfileNode(
+                name='male',
+                sound_profile_variant=[
+                    shapescape_dialogue_2.parser.SoundProfileVariant(
+                        name='obi_wan',
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='starwars/obi_wan/male',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='starwars/obi_wan/male'
+                                    ),
+                                    line_number=4
+                                )
+                            )
+                        ],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                            value='obi_wan',
+                            line_number=4
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.SoundProfileVariant(
+                        name='grevious',
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='starwars/grevious/male',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='starwars/grevious/male'
+                                    ),
+                                    line_number=5
+                                )
+                            )
+                        ],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                            value='grevious',
+                            line_number=5
+                        )
+                    )
+                ],
+                token=shapescape_dialogue_2.parser.Token(
+                    token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                    value='male',
+                    line_number=3
+                )
+            ),
+            shapescape_dialogue_2.parser.SoundProfileNode(
+                name='female',
+                sound_profile_variant=[
+                    shapescape_dialogue_2.parser.SoundProfileVariant(
+                        name='obi_wan',
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='starwars/obi_wan/female',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='starwars/obi_wan/female'
+                                    ),
+                                    line_number=7
+                                )
+                            )
+                        ],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                            value='obi_wan',
+                            line_number=7
+                        )
+                    ),
+                    shapescape_dialogue_2.parser.SoundProfileVariant(
+                        name='grevious',
+                        settings=[
+                            shapescape_dialogue_2.parser.SettingNode(
+                                name='sound',
+                                value='starwars/grevious/apache_helicopter',
+                                token=shapescape_dialogue_2.parser.Token(
+                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                    value=shapescape_dialogue_2.parser.Setting(
+                                        name='sound',
+                                        value='starwars/grevious/apache_helicopter'
+                                    ),
+                                    line_number=8
+                                )
+                            )
+                        ],
+                        token=shapescape_dialogue_2.parser.Token(
+                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                            value='grevious',
+                            line_number=8
+                        )
+                    )
+                ],
+                token=shapescape_dialogue_2.parser.Token(
+                    token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
+                    value='female',
+                    line_number=6
+                )
+            )
+        ],
+        token=shapescape_dialogue_2.parser.Token(
+            token_type=shapescape_dialogue_2.parser.TokenType.SOUND_PROFILES,
+            value='sound_profiles:',
+            line_number=2
+        )
+    )
+)
+
+
+
+
+
+shapescape_dialogue_2.compiler.AnimationTimeline(
+    events={
+        0: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='scorebard players set @a force 0'
+                )
+            ]
+        ),
+        20: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='event entity @e[type=shapescape:obi_wan] '
+                        'remove_high_ground'
+                ),
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='tell',
+                    value='[Obi-Wan] Hello there!'
+                )
+            ]
+        ),
+        30: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                ),
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='tell',
+                    value='[Grevious] General Kenobi!'
+                ),
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='tell',
+                    value='[this is just an example...] This is a multiline text.'
+                )
+            ]
+        ),
+        32: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        34: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        36: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        38: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        40: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        42: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='playsound grievous.cough'
+                )
+            ]
+        ),
+        44: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='title',
+                    value='Bossfight!'
+                ),
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='subtitle',
+                    value='This is a subtitle.'
+                ),
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='scoreboard players set @a force 100'
+                )
+            ]
+        ),
+        54: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='actionbar',
+                    value='Objective: kill General Grevious'
+                )
+            ]
+        ),
+        64: shapescape_dialogue_2.compiler.TimelineEvent(actions=[]),
+        2000: shapescape_dialogue_2.compiler.TimelineEvent(
+            actions=[
+                shapescape_dialogue_2.compiler.TimelineEventAction(
+                    action_type='command',
+                    value='execute @a[type=shapescape:clone] ~ ~ ~  function '
+                        'order_66'
+                )
+            ]
+        ),
+    }
+)

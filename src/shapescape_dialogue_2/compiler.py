@@ -1,11 +1,21 @@
 from __future__ import annotations
+import functools
 from .parser import CameraNode, DialogueNode, MessageNode, SettingsNode, SoundProfileNode
 from .message_duration import (
     cpm_duration, wpm_duration, sound_duration)
-from .parser import RootAstNode, SettingsList
+from .parser import SettingsList
 from dataclasses import dataclass, field
 from typing import List, Literal, NamedTuple, Optional, Union, Dict
 from pathlib import Path
+import math
+
+def tick(duration: Union[float, str, int]) -> int:
+    '''
+    Converts duration in seconds to tick count. The values are always rounded
+    up.
+    '''
+    return int(math.ceil(float(duration) * 20))
+
 
 class CompileError(Exception):
     '''
@@ -15,23 +25,17 @@ class CompileError(Exception):
     @staticmethod
     def from_invalid_setting(
             message_node: MessageNode, setting_name: str) -> CompileError:
-        line_number: Union[str, int] = (
-            '[unknown line number]'
-            if len(message_node.settings) == 0
-            else message_node.settings[0].line_number)
         return CompileError(
-            f'Invalid property "{setting_name}" on line {line_number}')
+            f'Invalid property "{setting_name}" on line '
+            f'{message_node.token.line_number}')
 
     @staticmethod
     def from_invalid_setting_value(
             message_node: MessageNode, setting_name: str) -> CompileError:
-        line_number: Union[str, int] = (
-            '[unknown line number]'
-            if len(message_node.settings) == 0
-            else message_node.settings[0].line_number)
         return CompileError(
             f'Invalid value for property "{setting_name}" on line '
-            f'{line_number}')
+            f'{message_node.token.line_number}')
+
 @dataclass
 class TranslationCodeProvider:
     '''
@@ -87,11 +91,11 @@ class ConfigProvider:
         '''
         settings_dict: Dict[str, str] = {}
         for setting in settings:
-            if setting.value.name in settings_dict:
+            if setting.name in settings_dict:
                 raise CompileError(
-                    f'Duplicate setting {setting.value.name} at line '
-                    f'{setting.line_number}')
-            settings_dict[setting.value.name] = setting.value.value
+                    f'Duplicate setting {setting.name} at line '
+                    f'{setting.token.line_number}')
+            settings_dict[setting.name] = setting.value
         return settings_dict
 
     @staticmethod
@@ -103,26 +107,25 @@ class ConfigProvider:
         '''
         sound_profile_dict: Dict[str, Path] = {}
         for variant in sound_profile.sound_profile_variant:
-            variant_name = variant.name
             variant_settings = variant.settings
-            if variant_name.value in sound_profile_dict:
+            if variant.name in sound_profile_dict:
                 raise CompileError(
                     f'Duplicate sound profile entry '
-                    f'{variant_name.value} at line '
-                    f'{variant_name.line_number}')
+                    f'{variant.name} at line '
+                    f'{variant.token.line_number}')
             settings = ConfigProvider.parse_settings(variant_settings)
             if 'sound' not in settings:
                 raise CompileError(
                     f'Missing sound setting on line '
-                    f'{variant_name.line_number}')
-            sound_profile_dict[variant_name.value] = Path(settings['sound'])
+                    f'{variant.token.line_number}')
+            sound_profile_dict[variant.name] = Path(settings['sound'])
         return sound_profile_dict
 
-    def message_node_duration(self, message_node: MessageNode) -> float:
+    def message_node_duration(self, message_node: MessageNode) -> int:
         '''
         Message node duration decides how to calculate the duration of an
-        message event and returns its value. If it's impossible to calculate
-        the duration it raises the CompileError.
+        message event and returns its value in Minecraft ticks. If it's
+        impossible to calculate the duration it raises the CompileError.
 
         The priorities of calculating that value are described here:
         - local 'time' property
@@ -136,17 +139,12 @@ class ConfigProvider:
         full_text = ""
         if message_node.node_type == 'blank':
             full_text = " ".join(
-                node.text.value for node in message_node.text_nodes)
+                node.text for node in message_node.text_nodes)
         # The settings of THIS node
         node_settings = ConfigProvider.parse_settings(message_node.settings)
-        # Line number of settings used for error messages
-        line_number: Union[str, int] = (
-            '[unknown line number]'
-            if len(message_node.settings) == 0
-            else message_node.settings[0].line_number)
         # Try using local settings
         if 'time' in node_settings:
-            return float(node_settings['time'])
+            return tick(node_settings['time'])
         if 'wpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'wpm')
@@ -155,7 +153,7 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'wpm')
-            return wpm_duration(full_text, wpm)
+            return tick(wpm_duration(full_text, wpm))
         if 'cpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'cpm')
@@ -164,7 +162,7 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'cpm')
-            return cpm_duration(full_text, cpm)
+            return tick(cpm_duration(full_text, cpm))
         if 'sound' in node_settings:
             if (
                     self.sound_profile is not None and
@@ -174,25 +172,25 @@ class ConfigProvider:
                     raise CompileError(
                         f"Trying to use undefined sound variant "
                         f"{sound_variant} of the sound {sound_name} on "
-                        f"line {line_number}")
+                        f"line {message_node.token.line_number}")
                 sound_path = self.sound_profile[sound_variant] / sound_name
             else:
                 sound_path = Path(node_settings['sound'])
             duration = sound_duration(sound_path)
             if duration is not None:
-                return duration
+                return tick(duration)
         # 'wpm' and 'cpm' shouldn't give errors from 'blank' message nodes
         # if these properties are implemented in global settings
         if 'wpm' in self.settings and message_node.node_type != 'blank':
-            return wpm_duration(full_text, float(self.settings['wpm']))
+            return tick(wpm_duration(full_text, float(self.settings['wpm'])))
         if 'cpm' in self.settings and message_node.node_type != 'blank':
-            return cpm_duration(full_text, float(self.settings['cpm']))
+            return tick(cpm_duration(full_text, float(self.settings['cpm'])))
         # TODO - Should I use 'time' property from global settings? Should
         # the local and global settings be converted to a proper type before
         # we reach this point?
         raise CompileError(
             f'Cannot calculate duration of message node at line '
-            f'{message_node.line_number}')
+            f'{message_node.token.line_number}')
 
 @dataclass
 class TimelineEventAction:
@@ -233,37 +231,18 @@ class TimelineEventAction:
         else:
             raise ValueError(f"Unknown action type: {self.action_type}")
 
-class Timestamp(NamedTuple):
-    '''
-    Timestamp is used for timestamping the TimelineEvent. They have two values
-    the 'time' and 'timeline_index'. The 'timeline_index' is used for timelines
-    which have alternative ways to progress
-    '''
-    timeline_index: int
-    time: float
-
-
 @dataclass
 class TimelineEvent:
     '''
     Timeline event is a single event that takes place on a timeline.
-    Timeline events can be sorted by their timestamp. They duration is used
-    to determine the duration of entire timeline and for merging timelines.
     '''
-    timestamp: Timestamp
-    duration: float
     actions: List[TimelineEventAction]
 
-TimelineNode = Union[MessageNode, DialogueNode, CameraNode]
-'''
-TimelineToken is an alias for the nodes that you can find on the timeline. In
-the RootAstNode or inside time property of CameraNode.
-'''
-
-class Timeline:
+@dataclass
+class AnimationTimeline:
     '''
-    Timeline is a class that represents sequence of events. Possible timeline
-    events are:
+    AnimationTimeline is a class that represents sequence of events. Possible
+    timeline events are:
     - run command
     - display tellraw text
     - display title text
@@ -273,60 +252,97 @@ class Timeline:
     - from a list of events of known length (either a timeline of the root
         node or a time of the camera node)
     - from merging different timelines
-
-    The timestamps of the events can have any value but exported file rounds
-    everything to 1 Minecraft tick (1/20s) the events that fall into the same
-    bucket are executed in the same time.
     '''
+    events: Dict[int, TimelineEvent]
+
     @staticmethod
     def from_events_list(
             settings: ConfigProvider,
-            timeline_nodes: List[TimelineNode],
-            tc_provider_prefix: str) -> Timeline:
+            timeline_nodes: List[MessageNode],
+            tc_provider_prefix: str) -> AnimationTimeline:
         '''
         Creates a Timeline from a list of CameraNodes and MessageNodes.
         '''
         tc_provider = TranslationCodeProvider(tc_provider_prefix)
-        events: List[TimelineEvent] = []
-        time: float = 0.0
-        # timeline_index is incremented when it's impossible to predict the exact
-        # time value (for example when we use a DialogueNode)
-        timeline_index: int = 0
+        events: Dict[int, TimelineEvent] = {}
+
+        def add_event_action(time: int, *actions: TimelineEventAction):
+            if time not in events:
+                events[time] = TimelineEvent(actions=[])
+            events[time].actions.extend(actions)
+
+        # time is the time of the event on the timeline measured in Minecraft
+        # ticks
+        time: int = 0
         for node in timeline_nodes:
-            if isinstance(node, MessageNode):
-                duration = settings.message_node_duration(node)
-                timestamp = Timestamp(timeline_index, time)
-                actions: List[TimelineEventAction]
-                if node.node_type == 'tell':
-                    actions = [  # The messages
-                        TimelineEventAction('tell', text_node.text.value)
-                        for text_node in node.text_nodes
+            duration = settings.message_node_duration(node)
+            actions: List[TimelineEventAction]
+            if node.node_type == 'tell':
+                actions = [  # The messages
+                    TimelineEventAction('tell', text_node.text)
+                    for text_node in node.text_nodes
+                ]
+            elif node.node_type == 'blank':
+                actions = []
+            elif node.node_type == 'title':
+                if len(node.text_nodes) == 1:
+                    actions = [  # The title
+                        TimelineEventAction('title', node.text_nodes[0].text)
                     ]
-                elif node.node_type == 'blank':
-                    actions = []
-                elif node.node_type == 'title':
-                    
-                    if len(node.text_nodes) not in (1, 2):
-                        raise CompileError(
-                            f"Title node should have 1 or 2 text nodes") 
-                elif node.node_type == 'actionbar':
-                    if len(node.text_nodes) != 1:
-                        # TODO - better error message (it's impossible to
-                        # know the line number at this point)
-                        raise CompileError(
-                            f"Actionbar node should have exactly one text node")
-                    actions = [  # The messages
-                        TimelineEventAction('actionbar', text_node.text.value)
-                        for text_node in node.text_nodes
+                elif len(node.text_nodes) == 2:
+                    actions = [  # The title and subtitle
+                        TimelineEventAction('title', node.text_nodes[0].text),
+                        TimelineEventAction('subtitle', node.text_nodes[1].text)
                     ]
                 else:
-                    raise ValueError("Unknown MessageNode type")
-                time = time + duration
-            elif isinstance(node, DialogueNode):
-                raise NotImplementedError()
-            elif isinstance(node, CameraNode):
-                pass
+                    raise CompileError(
+                        "Title node should have 1 or 2 text nodes but it"
+                        f"has {len(node.text_nodes)}. Line "
+                        f"{node.token.line_number}") 
+            elif node.node_type == 'actionbar':
+                if len(node.text_nodes) != 1:
+                    raise CompileError(
+                        "Actionbar node should have exactly one text "
+                        f"node {node.token.line_number}")
+                actions = [  # The messages
+                    TimelineEventAction('actionbar', text_node.text)
+                    for text_node in node.text_nodes
+                ]
             else:
-                raise ValueError("Invalid timeline node")
-        # TODO
-        raise NotImplementedError("TODO WRITE MORE CODE")
+                raise ValueError("Unknown MessageNode type")
+            actions += [
+                TimelineEventAction('command', text_node.text)
+                for text_node in node.command_nodes
+            ]
+            if node.on_exit_node is not None:
+                on_exit_actions = [
+                    TimelineEventAction('command', text_node.text)
+                    for text_node in node.on_exit_node.command_nodes
+                ]
+                add_event_action(time + duration, *on_exit_actions)
+            for schedule_node in node.schedule_nodes:
+                schedule_time = tick(  # Should be safe (parser checks that)
+                    ConfigProvider.parse_settings(
+                        schedule_node.settings)['time'])
+                scheduled_actions = [
+                    TimelineEventAction('command', text_node.text)
+                    for text_node in schedule_node.command_nodes
+                ]
+                add_event_action(time + schedule_time, *scheduled_actions)
+            for loop_node in node.loop_nodes:
+                loop_time = tick(  # This should be safe (parser checks that)
+                    ConfigProvider.parse_settings(
+                        loop_node.settings)['time'])
+                if loop_time <= 0:
+                    loop_time = 1  # TODO - should I log a warning?
+                looping_actions = [
+                    TimelineEventAction('command', text_node.text)
+                    for text_node in loop_node.command_nodes
+                ]
+                loop_time_sum = 0
+                while loop_time_sum < duration:
+                    add_event_action(time + loop_time_sum, *looping_actions)
+                    loop_time_sum += loop_time
+            add_event_action(time, *actions)
+            time = time + duration
+        return AnimationTimeline(events)

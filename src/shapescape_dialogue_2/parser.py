@@ -9,7 +9,7 @@ from collections import deque
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import (
-    Any, Deque, List, Literal, NamedTuple, Optional, Tuple, Union)
+    Any, Callable, Deque, Dict, List, Literal, NamedTuple, Optional, Set, Tuple, Type, Union)
 
 
 class ParseError(Exception):
@@ -28,14 +28,11 @@ class ParseError(Exception):
 
     @staticmethod
     def from_unexpected_token_value(
-            token: Token, *expected: TokenType) -> ParseError:
+            token: Token, expected: str) -> ParseError:
         return ParseError(
             f"Unexpected token value {token.value} of token type "
             f"{token.token_type} at line "
-            f"{token.line_number}. Expected one of:\n"
-            +
-            "".join(f"\t- {t.descriptive_str()}\n" for t in expected)
-        )
+            f"{token.line_number}. Expected: {expected}")
 
     @staticmethod
     def from_duplicate_token(token: Token, duplicate: Token) -> ParseError:
@@ -67,11 +64,7 @@ class TokenType(Enum):
     CAMERA = auto()
     RUN_ONCE = auto()
     ON_EXIT = auto()
-
-    # Arbitrarily named labels (tokenizer categorizes them as text but they
-    # have different meaning in the parser)
-    SOUND_PROFILE = auto()
-    SOUND_PROFILE_VARIANT = auto()
+    NAMED_LABEL = auto()  # any kind of label with custom name
 
     # Other (more complex) tokens
     SETTING = auto()
@@ -140,11 +133,6 @@ class TokenType(Enum):
         # Unimplemented tokens return the string representation
         return f"{self}"
 
-# Labels that can't be categorized by the tokenizer
-NamedLabelTokenType = Literal[
-    TokenType.SOUND_PROFILE,
-    TokenType.SOUND_PROFILE_VARIANT]
-
 class Token(NamedTuple):
     '''
     Represents a token and it's parsed value
@@ -153,64 +141,41 @@ class Token(NamedTuple):
     value: Any
     line_number: int
 
-    def to_named_label_token(
-            self, new_type: NamedLabelTokenType) -> NamedLabelToken:
+    def get_str_from_named_label_token(self) -> str:
         '''
-        Validates and transforms to NamedLabelToken. It additionally changes
-        the token type to be more specific.
+        Validates a token for having 'str' as it's value, and the token type
+        TEXT and if it succeeds it returns the 'str' value.
         '''
-        if self.token_type != TokenType.TEXT:
-            raise ParseError.from_unexpected_token(self, new_type)
+        if self.token_type != TokenType.NAMED_LABEL:
+            raise ParseError.from_unexpected_token(self, TokenType.NAMED_LABEL)
         if not isinstance(self.value, str):
-            raise ParseError.from_unexpected_token_value(self, new_type)
-        return NamedLabelToken(new_type, self.value, self.line_number)
+            raise ParseError.from_unexpected_token_value(self, "string")
+        return self.value
 
-    def to_text_token(self) -> TextToken:
-        '''Validates and transforms to TextToken'''
+    def get_str_from_text_token(self) -> str:
+        '''
+        Validates a token for having 'str' as it's value, and the token type
+        TEXT and if it succeeds it returns the 'str' value.
+        '''
         if self.token_type != TokenType.TEXT:
             raise ParseError.from_unexpected_token(self, TokenType.TEXT)
         if not isinstance(self.value, str):
-            raise ParseError.from_unexpected_token_value(self, TokenType.TEXT)
-        return TextToken(self.token_type, self.value, self.line_number)
+            raise ParseError.from_unexpected_token_value(self, "string")
+        return self.value
 
-    def to_settings_token(self) -> SettingToken:
-        '''Validates and transforms to SettingToken'''
+    def get_setting(self) -> Setting:
+        '''
+        Validates a token for having Settings as it's value and if it succeeds
+        it returns the settings.
+        '''
         if (
                 not isinstance(self.value, Setting) or
                 self.token_type != TokenType.SETTING):
             raise ParseError(
-                f"Unable to convert token {self} to setting token "
-                f"at line {self.line_number}")
-        return SettingToken(*self)
-
-class SettingToken(Token):
-    '''
-    Specialized version of a Token created from Tokens with SETTING token
-    type (used for better type annotation)
-    '''
-    token_type: Literal[TokenType.SETTING]
-    value: Setting
-    line_number: int
-
-class NamedLabelToken(Token):
-    '''
-    NamedLabelToken is token for tokens that hold string value and represent
-    a label.
-    '''
-    token_type: NamedLabelTokenType
-    value: str
-    line_number: int
-
-class TextToken(Token):
-    '''
-    TextToken is a token for tokens that hold string value.
-    '''
-    token_type: Literal[TokenType.TEXT]
-    value: str
-    line_number: int
-
-
-SettingsList = List[SettingToken]
+                f"Unexpected value of token {self} "
+                f"at line {self.line_number}. Expected setting pair like: "
+                "<key>=<value>")
+        return self.value
 
 # Token values
 class Setting(NamedTuple):
@@ -218,7 +183,7 @@ class Setting(NamedTuple):
     name: str
     value: str
 
-class Coordinates(NamedTuple):
+class CoordinatesRotated(NamedTuple):
     '''Normal coordinates x y z [ry rx]'''
     x: float
     y: float
@@ -262,13 +227,13 @@ class Indent(NamedTuple):
             indent_type = 'tab'
             while len(indent_string) > depth and indent_string[depth] in '\t ':
                 if indent_string[depth] == ' ':
-                    raise ParseError("Mixed indentation") 
+                    raise ParseError("Mixed indentation")
                 depth += 1
         elif indent_string.startswith(' '):
             indent_type = 'space'
             while len(indent_string) > depth and indent_string[depth] in '\t ':
                 if indent_string[depth] == '\t':
-                    raise ParseError("Mixed indentation") 
+                    raise ParseError("Mixed indentation")
                 depth += 1
         return Indent(depth, indent_type)
 
@@ -329,7 +294,7 @@ TOKENIZER = re.Scanner([  # type: ignore
             f'(?: ({float_pattern}) ({float_pattern}))?',
         lambda s, t: (
             TokenType.COORDINATES_ROTATED,
-            Coordinates(
+            CoordinatesRotated(
                 float(s.match[1]), float(s.match[2]), float(s.match[3]),
                 float(s.match[4]) if s.match[4] is not None else None,
                 float(s.match[5]) if s.match[5] is not None else None,
@@ -337,8 +302,8 @@ TOKENIZER = re.Scanner([  # type: ignore
         )
     ),
     (r'/.+', lambda s, t: (TokenType.COMMAND, t[1:])),
-    (r'.+', lambda s, t: (TokenType.TEXT, t)),
-
+    (r'>.+', lambda s, t: (TokenType.TEXT, t[1:])),
+    (var_pattern + r':', lambda s, t: (TokenType.NAMED_LABEL, t[:-1])),
 ])
 
 def tokenize(source: List[str]) -> List[Token]:
@@ -432,34 +397,117 @@ class RootAstNode:
 @dataclass
 class SettingsNode:
     settings: SettingsList
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SettingsNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.SETTINGS:
             raise ParseError.from_unexpected_token(
                 token, TokenType.SETTINGS)
-        settings = SettingsNode.parse_settings(tokens)
-        return SettingsNode(settings)
+        settings = SettingsNode.parse_settings(
+            tokens,
+            accepted_settings={"wpm": float, "cpm": float, "title_max": int}
+        )
+        return SettingsNode(settings, root_token)
 
     @staticmethod
-    def parse_settings(tokens: Deque[Token]) -> SettingsList:
+    def parse_settings(
+            tokens: Deque[Token], *,
+            expected_settings: Dict[str, Callable[[Any], Any]]=None,
+            accepted_settings: Dict[str, Callable[[Any], Any]]=None
+    ) -> SettingsList:
         '''
         Parse settings is a helper function used to parse settings of any
-        label that allows having them.
+        label that allows having them. Performs setting validation.
+        - No duplicate settings are allowed
+        - Settings from "expected_settings" must be present and must be
+            of the expected type
+        - If "accepted_settings" is not None, only settings from this list
+            are allowed
+        If expected_settings or accepted_settings are None then it only
+        checks for duplicate settings.
+
+        The Callables from expected and accepted settings are functions that
+        take the value of the setting and try to convert it to the expected
+        type. If callable doesn't fail, the function assumes that the value is
+        valid.
         '''
         token = tokens[0]
         settings: SettingsList = []
+        logged_settings: Dict[str, SettingNode] = {}
         while token.token_type is TokenType.SETTING:
-            settings.append(tokens.popleft().to_settings_token())
+            setting = SettingNode.from_token_stack(tokens)
+            # Check accepted settings
+            if accepted_settings is not None:
+                # Does key exist?
+                if setting.name not in accepted_settings:
+                    raise ParseError(
+                        f"The '{setting.name}' is not allowed in this "
+                        f"context. Line {token.line_number}. Only following"
+                        "settings are accepted:"
+                        +
+                        "\n".join(
+                            f"\t-{setting}"
+                            for setting in accepted_settings)
+                        )
+                # Is the type correct?
+                try:
+                    accepted_settings[setting.name](setting.value)
+                except Exception:
+                    raise ParseError(
+                        f"The '{setting.name}' has an invalid value. "
+                        f"Line {token.line_number}.")
+            # Check duplicate settings
+            if setting.name in logged_settings:
+                raise ParseError(
+                    f"Duplicate setting {setting.name} at line "
+                    f"{setting.token.line_number}")
+            logged_settings[setting.name] = setting
+            settings.append(setting)
             token = tokens[0]
+        # Check if there are all the expected settings
+        if expected_settings is not None:
+            for key, func in expected_settings.items():
+                if key not in logged_settings:
+                    raise ParseError(
+                        f"Missing setting '{key}' at line "
+                        f"{token.line_number}")
+                try:
+                    func(logged_settings[key].value)
+                except Exception:
+                    raise ParseError(
+                        f"Invalid value for setting '{key}' at line "
+                        f"{token.line_number}")
         return settings
+
+@dataclass
+class SettingNode:
+    name: str
+    value: str
+    token: Token
+
+    @staticmethod
+    def from_token_stack(tokens: Deque[Token]) -> SettingNode:
+        token = tokens.popleft()
+        root_token = token
+        if token.token_type is not TokenType.SETTING:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SETTING)
+        name, value = Token.get_setting(token)
+        # TODO - perhaps I should check types of specific settings here?
+        return SettingNode(name, value, root_token)
 
 @dataclass
 class SoundProfilesNode:
     sound_profiles: List[SoundProfileNode]
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SoundProfilesNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.SOUND_PROFILES:
             raise ParseError.from_unexpected_token(
                 token, TokenType.SOUND_PROFILES)
@@ -469,9 +517,9 @@ class SoundProfilesNode:
             tokens.popleft()
             token = tokens[0]
         else:
-            return SoundProfilesNode([])
+            return SoundProfilesNode([], root_token)
         sound_profiles: List[SoundProfileNode] = []
-        while token.token_type == TokenType.TEXT:
+        while token.token_type == TokenType.NAMED_LABEL:
             sound_profiles.append(SoundProfileNode.from_token_stack(tokens))
             token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
@@ -480,26 +528,29 @@ class SoundProfilesNode:
         elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return SoundProfilesNode(sound_profiles)
+        return SoundProfilesNode(sound_profiles, root_token)
 
 @dataclass
 class SoundProfileNode:
-    name: NamedLabelToken
+    name: str
     sound_profile_variant: List[SoundProfileVariant]
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SoundProfileNode:
         token = tokens.popleft()
-        token = token.to_named_label_token(TokenType.SOUND_PROFILE)
-        name = token
+        root_token = token
+
+        name = token.get_str_from_named_label_token()
         # Expect indentation or finish parsing message node
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return SoundProfileNode(name, [])
+            return SoundProfileNode(name, [], root_token)
         sound_profile_variant: List[SoundProfileVariant] = []
-        while token.token_type == TokenType.TEXT:
+        while token.token_type == TokenType.NAMED_LABEL:
             sound_profile_variant.append(
                 SoundProfileVariant.from_token_stack(tokens))
             token = tokens[0]
@@ -509,19 +560,24 @@ class SoundProfileNode:
         elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return SoundProfileNode(name, sound_profile_variant)
+        return SoundProfileNode(name, sound_profile_variant, root_token)
 
 @dataclass
 class SoundProfileVariant:
-    name: NamedLabelToken
+    name: str
     settings: SettingsList
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> SoundProfileVariant:
         token = tokens.popleft()
-        token = token.to_named_label_token(TokenType.SOUND_PROFILE_VARIANT)
-        name = token
-        settings = SettingsNode.parse_settings(tokens)
-        return SoundProfileVariant(name, settings)
+        root_token = token
+        name = token.get_str_from_named_label_token()
+        settings = SettingsNode.parse_settings(
+            tokens,
+            accepted_settings={"sound": str},
+            expected_settings={"sound": str})
+        return SoundProfileVariant(name, settings, root_token)
 
 @dataclass
 class MessageNode:
@@ -531,12 +587,15 @@ class MessageNode:
     schedule_nodes: List[ScheduleNode]
     settings: SettingsList
     loop_nodes: List[LoopNode]
+    token: Token
     run_once_node: Optional[RunOnceNode] = None
     on_exit_node: Optional[OnExitNode] = None
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> MessageNode:
         token = tokens.popleft()
+        root_token = token
+
         node_type: Literal["tell", "blank", "title", "actionbar"]
         if token.token_type is TokenType.TELL:
             node_type = "tell"
@@ -554,14 +613,25 @@ class MessageNode:
         # Settings
         settings: SettingsList = []
         if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(tokens)
+            if node_type == "blank":
+                settings = SettingsNode.parse_settings(
+                    tokens,
+                    accepted_settings={"time": float, "sound": str})
+            else:
+                settings = SettingsNode.parse_settings(
+                    tokens,
+                    accepted_settings={
+                        "wpm": float, "cpm": float, "time": float,
+                        "sound": str
+                    }
+                )
             token = tokens[0]
         # Expect indentation or finish parsing message node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return MessageNode(node_type, [], [], [], settings, [])
+            return MessageNode(node_type, [], [], [], settings, [], root_token)
         # Text nodes
         text_nodes = []
         token = tokens[0]
@@ -599,7 +669,7 @@ class MessageNode:
                     raise ParseError.from_duplicate_token(
                         token, registered_exit_token)
                 registered_exit_token = token
-                on_exit_node = OnExitNode.from_token_stack(tokens) 
+                on_exit_node = OnExitNode.from_token_stack(tokens)
             # Shedule nodes
             if token.token_type is TokenType.SCHEDULE:
                 schedule_nodes.append(ScheduleNode.from_token_stack(tokens))
@@ -612,7 +682,7 @@ class MessageNode:
             tokens.popleft()
         return MessageNode(
             node_type, text_nodes, command_nodes, schedule_nodes, settings,
-            loop_nodes, run_once_node, on_exit_node)
+            loop_nodes, root_token, run_once_node, on_exit_node)
 
 
 @dataclass
@@ -620,6 +690,8 @@ class DialogueNode:
     text: TextNode
     dialogue_options: List[DialogueOptionNode]
     dialogue_exit: Optional[DialogueOptionNode]
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> DialogueNode:
         raise NotImplementedError()
@@ -628,6 +700,8 @@ class DialogueNode:
 class DialogueOptionNode:
     text_nodes: List[TextNode]
     command_nodes: List[CommandNode]
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> DialogueOptionNode:
         raise NotImplementedError()
@@ -635,10 +709,13 @@ class DialogueOptionNode:
 @dataclass
 class CameraNode:
     coordinates: List[CoordinateNode]
+    token: Token
     time: Optional[TimeNode] = None
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> CameraNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.CAMERA:
             raise ParseError.from_unexpected_token(
                 token, TokenType.CAMERA)
@@ -648,7 +725,7 @@ class CameraNode:
             tokens.popleft()
             token = tokens[0]
         else:
-            return CameraNode([], None)
+            return CameraNode([], root_token)
         # Coordinates
         coordinates = []
         token = tokens[0]
@@ -666,16 +743,18 @@ class CameraNode:
         # Expecte DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        return CameraNode(coordinates, time)
+        return CameraNode(coordinates, root_token, time)
 
 @dataclass
 class TimeNode:
     settings: SettingsList
     messages: List[MessageNode]
+    token: Token
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> TimeNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.TIME:
             raise ParseError.from_unexpected_token(
                 token, TokenType.TIME)
@@ -683,14 +762,15 @@ class TimeNode:
         # Settings
         settings: SettingsList = []
         if token.token_type is TokenType.SETTINGS:
-            settings = SettingsNode.parse_settings(tokens)
+            settings = SettingsNode.parse_settings(
+                tokens, accepted_settings={"time": float})
             token = tokens[0]
         # Expect indentation or finish parsing time node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return TimeNode(settings, [])
+            return TimeNode(settings, [], root_token)
         # Message nodes
         messages: List[MessageNode] = []
         while token.token_type in (
@@ -701,50 +781,76 @@ class TimeNode:
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        return TimeNode(settings, messages)
+        return TimeNode(settings, messages, root_token)
 
 @dataclass
 class CoordinateNode:
-    coordinates: Token
+    coordinates: AnyCoordinates
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> CoordinateNode:
-        token = tokens.popleft()
+        root_token = tokens.popleft()
         crds_tokens = (
             TokenType.COORDINATES_ROTATED,
             TokenType.COORDINATES_FACING_COORDINATES,
             TokenType.COORDINATES_FACING_ENTITY)
-        if token.token_type not in crds_tokens:
-            raise ParseError.from_unexpected_token(token, *crds_tokens)
-        return CoordinateNode(token)
+        if root_token.token_type not in crds_tokens:
+            raise ParseError.from_unexpected_token(root_token, *crds_tokens)
+        any_coordinates_type = (
+            CoordinatesRotated,
+            CoordinatesFacingCoordinates,
+            CoordinatesFacingEntity)
+        if not isinstance(root_token.value, any_coordinates_type):
+            raise ParseError(
+                f"Unable to parse coordinates from line "
+                f"{root_token.line_number}")
+        coordinates = root_token.value
+        return CoordinateNode(coordinates, root_token)
 
 @dataclass
 class TextNode:
-    text: TextToken
+    text: str
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> TextNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.TEXT:
             raise ParseError.from_unexpected_token(
                 token, TokenType.TEXT)
-        return TextNode(token.to_text_token())
+        if not isinstance(token.value, str):
+            raise ParseError.from_unexpected_token_value(
+                token, "string")
+        return TextNode(token.value, root_token)
 
 @dataclass
 class CommandNode:
-    command: Token
+    text: str
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> CommandNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.COMMAND:
             raise ParseError.from_unexpected_token(
                 token, TokenType.COMMAND)
-        return CommandNode(token)
+        if not isinstance(token.value, str):
+            raise ParseError.from_unexpected_token_value(
+                token, "string")
+        return CommandNode(token.value, root_token)
 
 @dataclass
 class RunOnceNode:
     command_nodes: List[CommandNode]
+    token: Token
+
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> RunOnceNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.RUN_ONCE:
             raise ParseError.from_unexpected_token(
                 token, TokenType.RUN_ONCE)
@@ -754,7 +860,7 @@ class RunOnceNode:
             tokens.popleft()
             token = tokens[0]
         else:
-            return RunOnceNode([])
+            return RunOnceNode([], root_token)
         # Command nodes
         command_nodes = []
         token = tokens[0]
@@ -767,16 +873,19 @@ class RunOnceNode:
         elif token.token_type is not TokenType.EOF:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return RunOnceNode(command_nodes)
+        return RunOnceNode(command_nodes, root_token)
 
 @dataclass
 class ScheduleNode:
     command_nodes: List[CommandNode]
     settings: SettingsList
+    token: Token
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> ScheduleNode:
         token = tokens.popleft()
+        root_token = token
+
         if token.token_type is not TokenType.SCHEDULE:
             raise ParseError.from_unexpected_token(
                 token, TokenType.SCHEDULE)
@@ -784,14 +893,17 @@ class ScheduleNode:
         # Settings
         settings: SettingsList = []
         if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(tokens)
+            settings = SettingsNode.parse_settings(
+                tokens,
+                accepted_settings={"time": float},
+                expected_settings={"time": float})
             token = tokens[0]
         # Expect indentation or finish parsing schedule node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return ScheduleNode([], [])
+            return ScheduleNode([], [], root_token)
         # Command nodes
         command_nodes = []
         token = tokens[0]
@@ -804,14 +916,17 @@ class ScheduleNode:
         elif token.token_type is not TokenType.EOF:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return ScheduleNode(command_nodes, settings)
+        return ScheduleNode(command_nodes, settings, root_token)
 
 @dataclass
 class OnExitNode:
     command_nodes: List[CommandNode]
+    token: Token
+    
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> OnExitNode:
         token = tokens.popleft()
+        root_token = token
         if token.token_type is not TokenType.ON_EXIT:
             raise ParseError.from_unexpected_token(
                 token, TokenType.ON_EXIT)
@@ -821,7 +936,7 @@ class OnExitNode:
             tokens.popleft()
             token = tokens[0]
         else:
-            return OnExitNode([])
+            return OnExitNode([], root_token)
         # Command nodes
         command_nodes = []
         token = tokens[0]
@@ -834,16 +949,19 @@ class OnExitNode:
         elif token.token_type is not TokenType.EOF:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return OnExitNode(command_nodes)
+        return OnExitNode(command_nodes, root_token)
 
 @dataclass
 class LoopNode:
     command_nodes: List[CommandNode]
     settings: SettingsList
+    token: Token
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> LoopNode:
         token = tokens.popleft()
+        root_token = token
+
         if token.token_type is not TokenType.LOOP:
             raise ParseError.from_unexpected_token(
                 token, TokenType.LOOP)
@@ -851,14 +969,17 @@ class LoopNode:
         # Settings
         settings: SettingsList = []
         if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(tokens)
+            settings = SettingsNode.parse_settings(
+                tokens,
+                accepted_settings={"time": float},
+                expected_settings={"time": float})
             token = tokens[0]
         # Expect indentation or finish parsing run once node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return LoopNode([], settings)
+            return LoopNode([], settings, root_token)
         # Command nodes
         command_nodes = []
         token = tokens[0]
@@ -871,13 +992,20 @@ class LoopNode:
         elif token.token_type is not TokenType.EOF:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return LoopNode(command_nodes, settings)
+        return LoopNode(command_nodes, settings, root_token)
 
 
 # The main AST builder function
 def build_ast(tokens: List[Token]) -> RootAstNode:
     '''
-    Builds an abstract syntax tree from a list of tokens. 
+    Builds an abstract syntax tree from a list of tokens.
     '''
     tokens_stack = deque(tokens)
     return RootAstNode.from_token_stack(tokens_stack)
+
+
+# Type aliases
+SettingsList = List[SettingNode]
+
+AnyCoordinates = Union[
+    CoordinatesFacingCoordinates, CoordinatesFacingEntity, CoordinatesRotated]

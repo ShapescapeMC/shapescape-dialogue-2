@@ -9,23 +9,25 @@ sound_profiles:
 
 camera:
     10 10 10 90 0
-    5 5 5 90 0
+    5 5 5 30 0
+    5 10 5 0 0
+    5 10 5 0 0
     time:
         blank: time=1
             /scorebard players set @a force 0
             run_once:
                 /summon shapescape:obi_wan 1 2 3
-            schedule: time=100
+            schedule: time=2.3
                 /execute @a[type=shapescape:clone] ~ ~ ~  function order_66
             on_exit:
                 /event entity @e[type=shapescape:obi_wan] remove_high_ground
         tell: sound=obi_wan:hello.ogg
             >[Obi-Wan] Hello there!
-        tell: wpm=90 sound=grievous:general_kenobi.ogg
+        tell: wpm=90 sound=grevious:general_kenobi.ogg
             >[Grevious] General Kenobi!
             >[this is just an example...] This is a multiline text.
             loop: time=0.1
-                /playsound grievous.cough
+                /playsound grevious.cough
         title:
             >Bossfight!
             >This is a subtitle.
@@ -34,6 +36,8 @@ camera:
                 /music play bossfight
         actionbar:
             >Objective: kill General Grevious
+        tell:
+            >[Narrator] And they started to fight and this line is just to add a really long quote to test how the generator handles it. This should significantly increase the length of the animaiton. I hope the generator wont die from generating so much /tp commands. We'll see. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text. More text.
         blank: sound=starwars/rd2d/beep_boop.ogg time=1
 
 ## tell: [Grevious] You are a bold one.

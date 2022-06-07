@@ -184,12 +184,12 @@ class Setting(NamedTuple):
     value: str
 
 class CoordinatesRotated(NamedTuple):
-    '''Normal coordinates x y z [ry rx]'''
+    '''Normal coordinates x y z ry rx'''
     x: float
     y: float
     z: float
-    y_rot: Optional[float] = None
-    x_rot: Optional[float] = None
+    y_rot: float
+    x_rot: float
 
 class CoordinatesFacingEntity(NamedTuple):
     '''Coordinates and direction facing entity'''
@@ -291,13 +291,12 @@ TOKENIZER = re.Scanner([  # type: ignore
     ),
     (
         f'({float_pattern}) ({float_pattern}) ({float_pattern})'
-            f'(?: ({float_pattern}) ({float_pattern}))?',
+            f' ({float_pattern}) ({float_pattern})',
         lambda s, t: (
             TokenType.COORDINATES_ROTATED,
             CoordinatesRotated(
                 float(s.match[1]), float(s.match[2]), float(s.match[3]),
-                float(s.match[4]) if s.match[4] is not None else None,
-                float(s.match[5]) if s.match[5] is not None else None,
+                float(s.match[4]), float(s.match[5]),
             )
         )
     ),
@@ -482,6 +481,14 @@ class SettingsNode:
                         f"{token.line_number}")
         return settings
 
+    @staticmethod
+    def settings_list_to_dict(settings: SettingsList) -> Dict[str, str]:
+        '''
+        Returns the Dictionary representation of the settings list. Doesn't do
+        safety checks for duplicate properties.
+        '''
+        return {setting.name: setting.value for setting in settings}
+
 @dataclass
 class SettingNode:
     name: str
@@ -533,7 +540,7 @@ class SoundProfilesNode:
 @dataclass
 class SoundProfileNode:
     name: str
-    sound_profile_variant: List[SoundProfileVariant]
+    sound_profile_variants: List[SoundProfileVariant]
     token: Token
 
     @staticmethod
@@ -561,6 +568,17 @@ class SoundProfileNode:
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
         return SoundProfileNode(name, sound_profile_variant, root_token)
+
+    def as_dictionary(self) -> Dict[str, str]:
+        '''
+        Returns the dictionary representation of this sound profile.
+        '''
+        result: Dict[str, str] = {}
+        for spv in self.sound_profile_variants:
+            settings = SettingsNode.settings_list_to_dict(spv.settings)
+            sound = settings['sound']  # No KeyError check here, should be safe
+            result[spv.name] = sound
+        return result
 
 @dataclass
 class SoundProfileVariant:
@@ -708,9 +726,9 @@ class DialogueOptionNode:
 
 @dataclass
 class CameraNode:
-    coordinates: List[CoordinateNode]
+    coordinates: List[CoordinatesNode]
     token: Token
-    time: Optional[TimeNode] = None
+    time: TimeNode
 
     @staticmethod
     def from_token_stack(tokens: Deque[Token]) -> CameraNode:
@@ -721,11 +739,10 @@ class CameraNode:
                 token, TokenType.CAMERA)
         # Expect indentation or finish parsing camera node
         token = tokens[0]
-        if token.token_type == TokenType.INDENT:
-            tokens.popleft()
-            token = tokens[0]
-        else:
-            return CameraNode([], root_token)
+        if token.token_type is not TokenType.INDENT:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.INDENT)
+        tokens.popleft()
         # Coordinates
         coordinates = []
         token = tokens[0]
@@ -733,13 +750,14 @@ class CameraNode:
                 TokenType.COORDINATES_ROTATED,
                 TokenType.COORDINATES_FACING_COORDINATES,
                 TokenType.COORDINATES_FACING_ENTITY):
-            coordinates.append(CoordinateNode.from_token_stack(tokens))
+            coordinates.append(CoordinatesNode.from_token_stack(tokens))
             token = tokens[0]
         # Time
-        time: Optional[TimeNode] = None
-        if token.token_type is TokenType.TIME:
-            time = TimeNode.from_token_stack(tokens)
-            token = tokens[0]
+        if token.token_type is not TokenType.TIME:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.TIME)
+        time = TimeNode.from_token_stack(tokens)
+        tokens.popleft()
         # Expecte DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
@@ -784,12 +802,12 @@ class TimeNode:
         return TimeNode(settings, messages, root_token)
 
 @dataclass
-class CoordinateNode:
+class CoordinatesNode:
     coordinates: AnyCoordinates
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> CoordinateNode:
+    def from_token_stack(tokens: Deque[Token]) -> CoordinatesNode:
         root_token = tokens.popleft()
         crds_tokens = (
             TokenType.COORDINATES_ROTATED,
@@ -806,7 +824,7 @@ class CoordinateNode:
                 f"Unable to parse coordinates from line "
                 f"{root_token.line_number}")
         coordinates = root_token.value
-        return CoordinateNode(coordinates, root_token)
+        return CoordinatesNode(coordinates, root_token)
 
 @dataclass
 class TextNode:

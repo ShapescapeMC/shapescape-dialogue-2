@@ -273,27 +273,27 @@ class TimelineEventAction:
         if self.action_type == "tellraw":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                '/tellraw @a '
+                'tellraw @a '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "title":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                '/titleraw @a title'
+                'titleraw @a title'
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "actionbar":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                '/titleraw @a actionbar'
+                'titleraw @a actionbar'
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "subtitle":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                '/titleraw @a subtitle'
+                'titleraw @a subtitle'
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "command":
             return self.value
         elif self.action_type == "playsound":
-            return f'/playsound {sc_provider.get_sound_code(Path(self.value))}'
+            return f'playsound {sc_provider.get_sound_code(Path(self.value))}'
         else:
             raise ValueError(f"Unknown action type: {self.action_type}")
 

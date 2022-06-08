@@ -21,14 +21,12 @@ from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesRotated, DialogueNode, MessageNode,
                      SettingsList, SettingsNode, SoundProfileNode)
 
-
 def tick(duration: Union[float, str, int]) -> int:
     '''
     Converts duration in seconds to tick count. The values are always rounded
     up.
     '''
     return int(math.ceil(float(duration) * 20))
-
 
 class CompileError(Exception):
     '''

@@ -1,8 +1,10 @@
-from .compiler import AnimationControllerTimeline, AnimationTimeline, ConfigProvider
-from .parser import tokenize, build_ast
 from pathlib import Path
 
 import prettyprinter  # pip install prettyprinter (pprint didn't work nicely)
+
+from .compiler import AnimationControllerTimeline, ConfigProvider
+from .parser import build_ast, tokenize
+
 
 def main():
     prettyprinter.install_extras(

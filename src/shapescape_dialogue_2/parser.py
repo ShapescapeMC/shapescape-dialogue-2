@@ -2,14 +2,12 @@
 Parser module implements a parser for custom dialogue syntax.
 '''
 from __future__ import annotations
-from msilib.schema import Dialog
 
 import re
 from collections import deque
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import (
-    Any, Callable, Deque, Dict, List, Literal, NamedTuple, Optional, Set, Tuple, Type, Union)
+from typing import Any, Callable, Literal, NamedTuple, Optional, Union
 
 
 class ParseError(Exception):
@@ -305,12 +303,12 @@ TOKENIZER = re.Scanner([  # type: ignore
     (var_pattern + r':', lambda s, t: (TokenType.NAMED_LABEL, t[:-1])),
 ])
 
-def tokenize(source: List[str]) -> List[Token]:
+def tokenize(source: list[str]) -> list[Token]:
     '''
     Splits a source file into tokens.
     '''
     line_number = 0
-    tokens: List[Token] = []
+    tokens: list[Token] = []
     indent_stack = deque((0,))
     indent_type = 'unknown'
     for line in source:
@@ -358,12 +356,12 @@ def tokenize(source: List[str]) -> List[Token]:
 # AST builder
 @dataclass
 class RootAstNode:
-    timeline: List[Union[MessageNode, DialogueNode, CameraNode]]
+    timeline: list[Union[MessageNode, DialogueNode, CameraNode]]
     settings: Optional[SettingsNode] = None
     sound_profiles: Optional[SoundProfilesNode] = None
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]):
+    def from_token_stack(tokens: deque[Token]):
         token = tokens[0]
         # Settings
         settings = None
@@ -376,7 +374,7 @@ class RootAstNode:
             sound_profiles = SoundProfilesNode.from_token_stack(tokens)
             token = tokens[0]
         # Timeline
-        timeline: List[Union[MessageNode, DialogueNode, CameraNode]] = []
+        timeline: list[Union[MessageNode, DialogueNode, CameraNode]] = []
         while token.token_type is not TokenType.EOF:
             if token.token_type in (
                     TokenType.TELL, TokenType.TITLE, TokenType.ACTIONBAR,
@@ -399,7 +397,7 @@ class SettingsNode:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> SettingsNode:
+    def from_token_stack(tokens: deque[Token]) -> SettingsNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.SETTINGS:
@@ -413,9 +411,9 @@ class SettingsNode:
 
     @staticmethod
     def parse_settings(
-            tokens: Deque[Token], *,
-            expected_settings: Dict[str, Callable[[Any], Any]]=None,
-            accepted_settings: Dict[str, Callable[[Any], Any]]=None
+            tokens: deque[Token], *,
+            expected_settings: dict[str, Callable[[Any], Any]]=None,
+            accepted_settings: dict[str, Callable[[Any], Any]]=None
     ) -> SettingsList:
         '''
         Parse settings is a helper function used to parse settings of any
@@ -435,7 +433,7 @@ class SettingsNode:
         '''
         token = tokens[0]
         settings: SettingsList = []
-        logged_settings: Dict[str, SettingNode] = {}
+        logged_settings: dict[str, SettingNode] = {}
         while token.token_type is TokenType.SETTING:
             setting = SettingNode.from_token_stack(tokens)
             # Check accepted settings
@@ -482,9 +480,9 @@ class SettingsNode:
         return settings
 
     @staticmethod
-    def settings_list_to_dict(settings: SettingsList) -> Dict[str, str]:
+    def settings_list_to_dict(settings: SettingsList) -> dict[str, str]:
         '''
-        Returns the Dictionary representation of the settings list. Doesn't do
+        Returns the dictionary representation of the settings list. Doesn't do
         safety checks for duplicate properties.
         '''
         return {setting.name: setting.value for setting in settings}
@@ -496,7 +494,7 @@ class SettingNode:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> SettingNode:
+    def from_token_stack(tokens: deque[Token]) -> SettingNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.SETTING:
@@ -508,11 +506,11 @@ class SettingNode:
 
 @dataclass
 class SoundProfilesNode:
-    sound_profiles: List[SoundProfileNode]
+    sound_profiles: list[SoundProfileNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> SoundProfilesNode:
+    def from_token_stack(tokens: deque[Token]) -> SoundProfilesNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.SOUND_PROFILES:
@@ -525,7 +523,7 @@ class SoundProfilesNode:
             token = tokens[0]
         else:
             return SoundProfilesNode([], root_token)
-        sound_profiles: List[SoundProfileNode] = []
+        sound_profiles: list[SoundProfileNode] = []
         while token.token_type == TokenType.NAMED_LABEL:
             sound_profiles.append(SoundProfileNode.from_token_stack(tokens))
             token = tokens[0]
@@ -540,11 +538,11 @@ class SoundProfilesNode:
 @dataclass
 class SoundProfileNode:
     name: str
-    sound_profile_variants: List[SoundProfileVariant]
+    sound_profile_variants: list[SoundProfileVariant]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> SoundProfileNode:
+    def from_token_stack(tokens: deque[Token]) -> SoundProfileNode:
         token = tokens.popleft()
         root_token = token
 
@@ -556,7 +554,7 @@ class SoundProfileNode:
             token = tokens[0]
         else:
             return SoundProfileNode(name, [], root_token)
-        sound_profile_variant: List[SoundProfileVariant] = []
+        sound_profile_variant: list[SoundProfileVariant] = []
         while token.token_type == TokenType.NAMED_LABEL:
             sound_profile_variant.append(
                 SoundProfileVariant.from_token_stack(tokens))
@@ -569,11 +567,11 @@ class SoundProfileNode:
                 token, TokenType.DEDENT, TokenType.EOF)
         return SoundProfileNode(name, sound_profile_variant, root_token)
 
-    def as_dictionary(self) -> Dict[str, str]:
+    def as_dictionary(self) -> dict[str, str]:
         '''
         Returns the dictionary representation of this sound profile.
         '''
-        result: Dict[str, str] = {}
+        result: dict[str, str] = {}
         for spv in self.sound_profile_variants:
             settings = SettingsNode.settings_list_to_dict(spv.settings)
             sound = settings['sound']  # No KeyError check here, should be safe
@@ -587,7 +585,7 @@ class SoundProfileVariant:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> SoundProfileVariant:
+    def from_token_stack(tokens: deque[Token]) -> SoundProfileVariant:
         token = tokens.popleft()
         root_token = token
         name = token.get_str_from_named_label_token()
@@ -600,17 +598,17 @@ class SoundProfileVariant:
 @dataclass
 class MessageNode:
     node_type: Literal["tell", "blank", "title", "actionbar"]
-    text_nodes: List[TextNode]
-    command_nodes: List[CommandNode]
-    schedule_nodes: List[ScheduleNode]
+    text_nodes: list[TextNode]
+    command_nodes: list[CommandNode]
+    schedule_nodes: list[ScheduleNode]
     settings: SettingsList
-    loop_nodes: List[LoopNode]
+    loop_nodes: list[LoopNode]
     token: Token
     run_once_node: Optional[RunOnceNode] = None
     on_exit_node: Optional[OnExitNode] = None
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> MessageNode:
+    def from_token_stack(tokens: deque[Token]) -> MessageNode:
         token = tokens.popleft()
         root_token = token
 
@@ -669,8 +667,8 @@ class MessageNode:
         registered_run_once_token: Optional[Token] = None  # used for errrors
         on_exit_node: Optional[OnExitNode] = None
         registered_exit_token: Optional[Token] = None  # used for errors
-        schedule_nodes: List[ScheduleNode] = []
-        loop_nodes: List[LoopNode] = []
+        schedule_nodes: list[ScheduleNode] = []
+        loop_nodes: list[LoopNode] = []
         while token.token_type in (
                 TokenType.SCHEDULE, TokenType.RUN_ONCE, TokenType.ON_EXIT,
                 TokenType.LOOP):
@@ -706,32 +704,32 @@ class MessageNode:
 @dataclass
 class DialogueNode:
     text: TextNode
-    dialogue_options: List[DialogueOptionNode]
+    dialogue_options: list[DialogueOptionNode]
     dialogue_exit: Optional[DialogueOptionNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> DialogueNode:
+    def from_token_stack(tokens: deque[Token]) -> DialogueNode:
         raise NotImplementedError()
 
 @dataclass
 class DialogueOptionNode:
-    text_nodes: List[TextNode]
-    command_nodes: List[CommandNode]
+    text_nodes: list[TextNode]
+    command_nodes: list[CommandNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> DialogueOptionNode:
+    def from_token_stack(tokens: deque[Token]) -> DialogueOptionNode:
         raise NotImplementedError()
 
 @dataclass
 class CameraNode:
-    coordinates: List[CoordinatesNode]
+    coordinates: list[CoordinatesNode]
     token: Token
     time: TimeNode
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> CameraNode:
+    def from_token_stack(tokens: deque[Token]) -> CameraNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.CAMERA:
@@ -766,11 +764,11 @@ class CameraNode:
 @dataclass
 class TimeNode:
     settings: SettingsList
-    messages: List[MessageNode]
+    messages: list[MessageNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> TimeNode:
+    def from_token_stack(tokens: deque[Token]) -> TimeNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.TIME:
@@ -790,7 +788,7 @@ class TimeNode:
         else:
             return TimeNode(settings, [], root_token)
         # Message nodes
-        messages: List[MessageNode] = []
+        messages: list[MessageNode] = []
         while token.token_type in (
                 TokenType.TELL, TokenType.TITLE, TokenType.BLANK,
                 TokenType.ACTIONBAR):
@@ -807,7 +805,7 @@ class CoordinatesNode:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> CoordinatesNode:
+    def from_token_stack(tokens: deque[Token]) -> CoordinatesNode:
         root_token = tokens.popleft()
         crds_tokens = (
             TokenType.COORDINATES_ROTATED,
@@ -832,7 +830,7 @@ class TextNode:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> TextNode:
+    def from_token_stack(tokens: deque[Token]) -> TextNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.TEXT:
@@ -849,7 +847,7 @@ class CommandNode:
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> CommandNode:
+    def from_token_stack(tokens: deque[Token]) -> CommandNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.COMMAND:
@@ -862,11 +860,11 @@ class CommandNode:
 
 @dataclass
 class RunOnceNode:
-    command_nodes: List[CommandNode]
+    command_nodes: list[CommandNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> RunOnceNode:
+    def from_token_stack(tokens: deque[Token]) -> RunOnceNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.RUN_ONCE:
@@ -895,12 +893,12 @@ class RunOnceNode:
 
 @dataclass
 class ScheduleNode:
-    command_nodes: List[CommandNode]
+    command_nodes: list[CommandNode]
     settings: SettingsList
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> ScheduleNode:
+    def from_token_stack(tokens: deque[Token]) -> ScheduleNode:
         token = tokens.popleft()
         root_token = token
 
@@ -938,11 +936,11 @@ class ScheduleNode:
 
 @dataclass
 class OnExitNode:
-    command_nodes: List[CommandNode]
+    command_nodes: list[CommandNode]
     token: Token
     
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> OnExitNode:
+    def from_token_stack(tokens: deque[Token]) -> OnExitNode:
         token = tokens.popleft()
         root_token = token
         if token.token_type is not TokenType.ON_EXIT:
@@ -971,12 +969,12 @@ class OnExitNode:
 
 @dataclass
 class LoopNode:
-    command_nodes: List[CommandNode]
+    command_nodes: list[CommandNode]
     settings: SettingsList
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: Deque[Token]) -> LoopNode:
+    def from_token_stack(tokens: deque[Token]) -> LoopNode:
         token = tokens.popleft()
         root_token = token
 
@@ -1014,7 +1012,7 @@ class LoopNode:
 
 
 # The main AST builder function
-def build_ast(tokens: List[Token]) -> RootAstNode:
+def build_ast(tokens: list[Token]) -> RootAstNode:
     '''
     Builds an abstract syntax tree from a list of tokens.
     '''
@@ -1023,7 +1021,7 @@ def build_ast(tokens: List[Token]) -> RootAstNode:
 
 
 # Type aliases
-SettingsList = List[SettingNode]
+SettingsList = list[SettingNode]
 
 AnyCoordinates = Union[
     CoordinatesFacingCoordinates, CoordinatesFacingEntity, CoordinatesRotated]

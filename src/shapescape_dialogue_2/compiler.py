@@ -8,9 +8,8 @@ from __future__ import annotations
 import math
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from multiprocessing.sharedctypes import Value
 from pathlib import Path
-from typing import Deque, Dict, List, Literal, Optional, Tuple, Union
+from typing import Literal, Optional, Union
 
 import numpy as np
 import scipy.interpolate
@@ -20,6 +19,7 @@ from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesFacingEntity, CoordinatesNode,
                      CoordinatesRotated, DialogueNode, MessageNode,
                      SettingsList, SettingsNode, SoundProfileNode)
+
 
 def tick(duration: Union[float, str, int]) -> int:
     '''
@@ -55,9 +55,9 @@ class TranslationCodeProvider:
     with a number.
     '''
     prefix: str
-    _counter: Dict[str, int] = field(
+    _counter: dict[str, int] = field(
         default_factory=lambda: defaultdict(lambda: 1))
-    _cached_translations: Dict[str, str] = field(default_factory=dict)
+    _cached_translations: dict[str, str] = field(default_factory=dict)
 
     def get_translation_code(self, translation: str) -> str:
         '''
@@ -73,7 +73,7 @@ class TranslationCodeProvider:
             self._cached_translations[translation] = result_text
             return result_text
 
-    def get_translation_file(self) -> List[str]:
+    def get_translation_file(self) -> list[str]:
         '''
         Returns a list of strings to be inserted into the .lang file.
         '''
@@ -89,7 +89,7 @@ class SoundCodeProvider:
     Sound code provider provides and remembers the short names for the sounds
     based on the file paths.
     '''
-    _cached_names: Dict[Path, str] = field(default_factory=dict)
+    _cached_names: dict[Path, str] = field(default_factory=dict)
 
     def get_sound_code(self, sound_path: Path) -> str:
         '''
@@ -112,17 +112,17 @@ class ConfigProvider:
             self, settings: SettingsNode,
             sound_profile: Optional[SoundProfileNode]=None):
         self.settings = ConfigProvider.parse_settings(settings.settings)
-        self.sound_profile: Optional[Dict[str, Path]] = (
+        self.sound_profile: Optional[dict[str, Path]] = (
             None if sound_profile is None else
             ConfigProvider.parse_sound_profile(sound_profile))
 
     @staticmethod
-    def parse_settings(settings: SettingsList) -> Dict[str, str]:
+    def parse_settings(settings: SettingsList) -> dict[str, str]:
         '''
         Returns a dictionary of settings from SettingsNode, chceks if there
         is no duplicate keys.
         '''
-        settings_dict: Dict[str, str] = {}
+        settings_dict: dict[str, str] = {}
         for setting in settings:
             if setting.name in settings_dict:
                 raise CompileError(
@@ -133,12 +133,12 @@ class ConfigProvider:
 
     @staticmethod
     def parse_sound_profile(
-            sound_profile: SoundProfileNode) -> Dict[str, Path]:
+            sound_profile: SoundProfileNode) -> dict[str, Path]:
         '''
         Returns a dictionary with available mappings of the sound profile
         to file paths.
         '''
-        sound_profile_dict: Dict[str, Path] = {}
+        sound_profile_dict: dict[str, Path] = {}
         for variant in sound_profile.sound_profile_variants:
             variant_settings = variant.settings
             if variant.name in sound_profile_dict:
@@ -302,7 +302,7 @@ class TimelineEvent:
     '''
     Timeline event is a single event that takes place on a timeline.
     '''
-    actions: List[TimelineEventAction]
+    actions: list[TimelineEventAction]
 
 @dataclass
 class AnimationTimeline:
@@ -319,17 +319,17 @@ class AnimationTimeline:
         node or a time of the camera node)
     - from merging different timelines
     '''
-    events: Dict[int, TimelineEvent]
+    events: dict[int, TimelineEvent]
     time: int
 
     @staticmethod
     def from_message_node_list(
             settings: ConfigProvider,
-            timeline_nodes: List[MessageNode]) -> AnimationTimeline:
+            timeline_nodes: list[MessageNode]) -> AnimationTimeline:
         '''
         Creates a AnimationTimeline from a list of MessageNodes.
         '''
-        events: Dict[int, TimelineEvent] = {}
+        events: dict[int, TimelineEvent] = {}
 
         def add_event_action(time: int, *actions: TimelineEventAction):
             if time not in events:
@@ -345,7 +345,7 @@ class AnimationTimeline:
                 node)
             if optional_sound_node is not None:
                 add_event_action(time, optional_sound_node)
-            actions: List[TimelineEventAction]
+            actions: list[TimelineEventAction]
             if node.node_type == 'tell':
                 actions = [  # The messages
                     TimelineEventAction('tell', text_node.text)
@@ -423,15 +423,15 @@ class AnimationTimeline:
         '''
         Creates a AnimationTimeline from a CameraNode.
         '''
-        keyframes: List[int] = list(np.linspace(
+        keyframes: list[int] = list(np.linspace(
             0, time, len(camera_node.coordinates), dtype=int))
         # A stack for processing the keyframes
-        frames_stack: Deque[Tuple[int, CoordinatesNode]] = deque(
+        frames_stack: deque[tuple[int, CoordinatesNode]] = deque(
             (keyframe, c)
             for keyframe, c in zip(keyframes, camera_node.coordinates)
         )
         # Get the end part of the command (the rotation)
-        rotation_suffixes: Dict[int, str] = {}
+        rotation_suffixes: dict[int, str] = {}
         while len(frames_stack) > 1:
             _, c = frames_stack[0]
             # Map the coordinates to the keyframes for later use
@@ -448,9 +448,9 @@ class AnimationTimeline:
                 raise ValueError()  # Should never happen
         # Get the start part of the command (the position) and combine it
         # with the rotation
-        xs: List[float] = []
-        ys: List[float] = []
-        zs: List[float] = []
+        xs: list[float] = []
+        ys: list[float] = []
+        zs: list[float] = []
         for c in camera_node.coordinates:
             xs.append(c.coordinates.x)
             ys.append(c.coordinates.y)
@@ -462,7 +462,7 @@ class AnimationTimeline:
             ys, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
         _, zs = b_spline_magic(
             zs, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
-        events: Dict[int , TimelineEvent] = {}
+        events: dict[int , TimelineEvent] = {}
         for frame, y, x, z in zip(frames, xs, ys, zs):
             frame = int(frame)
             if frame not in events:
@@ -474,8 +474,8 @@ class AnimationTimeline:
 
     @staticmethod
     def _get_tp_suffixes_crds_rotated(
-            frames_stack: Deque[Tuple[int, CoordinatesNode]],
-            ouptut: Dict[int, str], spline_fit_degree: int):
+            frames_stack: deque[tuple[int, CoordinatesNode]],
+            ouptut: dict[int, str], spline_fit_degree: int):
         '''
         Used by from_coordinates_list.
 
@@ -487,8 +487,8 @@ class AnimationTimeline:
         first_frame, c = frames_stack[0]
         last_frame = first_frame  # The last CoordinatesRotated frame
         next_frame = first_frame  # The frame after the last frame
-        ys: List[float] = []
-        xs: List[float] = []
+        ys: list[float] = []
+        xs: list[float] = []
         while isinstance(c.coordinates, CoordinatesRotated):
             last_frame = next_frame
             ys.append(c.coordinates.y_rot)
@@ -511,8 +511,8 @@ class AnimationTimeline:
 
     @staticmethod
     def _get_tp_suffixes_crds_facing_crds(
-            frames_stack: Deque[Tuple[int, CoordinatesNode]],
-            ouptut: Dict[int, str], spline_fit_degree: int):
+            frames_stack: deque[tuple[int, CoordinatesNode]],
+            ouptut: dict[int, str], spline_fit_degree: int):
         '''
         Used by from_coordinates_list.
 
@@ -525,9 +525,9 @@ class AnimationTimeline:
         first_frame, c = frames_stack[0]
         last_frame = first_frame  # The last CoordinatesRotated frame
         next_frame = first_frame  # The frame after the last frame
-        xs: List[float] = []
-        ys: List[float] = []
-        zs: List[float] = []
+        xs: list[float] = []
+        ys: list[float] = []
+        zs: list[float] = []
         while isinstance(c.coordinates, CoordinatesFacingCoordinates):
             last_frame = next_frame
             xs.append(c.coordinates.facing_x)
@@ -552,8 +552,8 @@ class AnimationTimeline:
             ouptut[int(frame)] = output_value
 
 def b_spline_magic(
-        y: List[float], x_start: float, x_end: float,
-        n_points: int, k: int=3) -> Tuple[List[float], List[float]]:
+        y: list[float], x_start: float, x_end: float,
+        n_points: int, k: int=3) -> tuple[list[float], list[float]]:
     '''
     The b_spline_magic function uses science to magically calculate evenly
     separated points on a B-spline of 'k' degree that goes through xy points.
@@ -599,19 +599,19 @@ class AnimationControllerTimeline:
     AnimationTimelines groupped together in the same tuple are intended to
     be played simultaneously during the same state.
     '''
-    events: List[Tuple[AnimationTimeline, ...]]
+    events: list[tuple[AnimationTimeline, ...]]
 
     @staticmethod
     def from_timeline_nodes(
-            timeline: List[Union[MessageNode, DialogueNode, CameraNode]],
+            timeline: list[Union[MessageNode, DialogueNode, CameraNode]],
             config_provider: ConfigProvider
             ) -> AnimationControllerTimeline:
-        events: List[Tuple[AnimationTimeline, ...]] = []
+        events: list[tuple[AnimationTimeline, ...]] = []
         timeline_deque = deque(timeline)
         while len(timeline_deque) > 0:
             node = timeline_deque.popleft()
             if isinstance(node, MessageNode):
-                message_nodes: List[MessageNode] = []
+                message_nodes: list[MessageNode] = []
                 while isinstance(node, MessageNode):
                     message_nodes.append(node)
                     timeline_deque.popleft()

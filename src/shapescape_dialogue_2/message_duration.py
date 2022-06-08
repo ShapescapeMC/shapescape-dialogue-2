@@ -2,9 +2,11 @@
 The message_duration module provides utilities for getting the duration of an
 animation needed for a text message.
 '''
-from typing import List, Optional
 from pathlib import Path
+from typing import Optional
+
 import mutagen
+
 
 def cpm_duration(text:str , cpm: float) -> float:
     '''

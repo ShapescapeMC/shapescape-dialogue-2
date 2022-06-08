@@ -3,9 +3,11 @@ The generator module uses the data produced by the compiler to generate
 Minecraft files.
 '''
 from __future__ import annotations
+
+import json
 from dataclasses import dataclass
 from pathlib import Path
-import json
+
 
 @dataclass
 class JsonFile:

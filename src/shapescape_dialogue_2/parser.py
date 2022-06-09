@@ -752,10 +752,8 @@ class CameraNode:
             token = tokens[0]
         # Time
         if token.token_type is not TokenType.TIME:
-            raise ParseError.from_unexpected_token(
-                token, TokenType.TIME)
+            raise ParseError.from_unexpected_token(token, TokenType.TIME)
         time = TimeNode.from_token_stack(tokens)
-        tokens.popleft()
         # Expecte DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
@@ -777,7 +775,7 @@ class TimeNode:
         token = tokens[0]
         # Settings
         settings: SettingsList = []
-        if token.token_type is TokenType.SETTINGS:
+        if token.token_type is TokenType.SETTING:
             settings = SettingsNode.parse_settings(
                 tokens, accepted_settings={"time": float})
             token = tokens[0]
@@ -785,8 +783,12 @@ class TimeNode:
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
-        else:
+        elif token.token_type == TokenType.DEDENT:
+            tokens.popleft()
             return TimeNode(settings, [], root_token)
+        else:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.INDENT, TokenType.DEDENT)
         # Message nodes
         messages: list[MessageNode] = []
         while token.token_type in (
@@ -795,6 +797,10 @@ class TimeNode:
             messages.append(MessageNode.from_token_stack(tokens))
             token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
+        if token.token_type is TokenType.DEDENT:
+            tokens.popleft()
+        # Double dedent. This part of code is reachable only if 'time' has
+        # subnodes
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
         return TimeNode(settings, messages, root_token)

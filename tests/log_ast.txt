@@ -1,625 +1,252 @@
 shapescape_dialogue_2.parser.RootAstNode(
     timeline=[
-        shapescape_dialogue_2.parser.CameraNode(
-            coordinates=[
-                shapescape_dialogue_2.parser.CoordinatesNode(
-                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
-                        x=10.0,
-                        y=10.0,
-                        z=10.0,
-                        y_rot=90.0,
-                        x_rot=0.0
-                    ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Piper] A FRANKENPLUSH!',
                     token=shapescape_dialogue_2.parser.Token(
-                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
-                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
-                            x=10.0,
-                            y=10.0,
-                            z=10.0,
-                            y_rot=90.0,
-                            x_rot=0.0
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Piper] A FRANKENPLUSH!',
+                        line_number=6
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.2.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.2.ogg'
+                        ),
+                        line_number=5
+                    )
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=5
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text="[Jonah] Correction: Frankenplush's Monster.",
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value="[Jonah] Correction: Frankenplush's Monster.",
+                        line_number=8
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.3.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.3.ogg'
+                        ),
+                        line_number=7
+                    )
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=7
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Jonah] Frankenstein was the maker, not the monster '
+                        'itself.',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Jonah] Frankenstein was the maker, not the monster '
+                            'itself.',
+                        line_number=10
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.4.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.4.ogg'
+                        ),
+                        line_number=9
+                    )
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=9
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Piper] Yeah, yeah, smarty-pants. ',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Piper] Yeah, yeah, smarty-pants. ',
+                        line_number=12
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.5.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.5.ogg'
                         ),
                         line_number=11
                     )
-                ),
-                shapescape_dialogue_2.parser.CoordinatesNode(
-                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
-                        x=5.0,
-                        y=5.0,
-                        z=5.0,
-                        y_rot=30.0,
-                        x_rot=0.0
-                    ),
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=11
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Piper] But maybe Frankenstein was the monster because '
+                        'he created the so-called monster.',
                     token=shapescape_dialogue_2.parser.Token(
-                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
-                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
-                            x=5.0,
-                            y=5.0,
-                            z=5.0,
-                            y_rot=30.0,
-                            x_rot=0.0
-                        ),
-                        line_number=12
-                    )
-                ),
-                shapescape_dialogue_2.parser.CoordinatesNode(
-                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
-                        x=5.0,
-                        y=10.0,
-                        z=5.0,
-                        y_rot=0.0,
-                        x_rot=0.0
-                    ),
-                    token=shapescape_dialogue_2.parser.Token(
-                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
-                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
-                            x=5.0,
-                            y=10.0,
-                            z=5.0,
-                            y_rot=0.0,
-                            x_rot=0.0
-                        ),
-                        line_number=13
-                    )
-                ),
-                shapescape_dialogue_2.parser.CoordinatesNode(
-                    coordinates=shapescape_dialogue_2.parser.CoordinatesRotated(
-                        x=5.0,
-                        y=10.0,
-                        z=5.0,
-                        y_rot=0.0,
-                        x_rot=0.0
-                    ),
-                    token=shapescape_dialogue_2.parser.Token(
-                        token_type=shapescape_dialogue_2.parser.TokenType.COORDINATES_ROTATED,
-                        value=shapescape_dialogue_2.parser.CoordinatesRotated(
-                            x=5.0,
-                            y=10.0,
-                            z=5.0,
-                            y_rot=0.0,
-                            x_rot=0.0
-                        ),
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Piper] But maybe Frankenstein was the monster '
+                            'because he created the so-called monster.',
                         line_number=14
                     )
                 )
             ],
-            token=shapescape_dialogue_2.parser.Token(
-                token_type=shapescape_dialogue_2.parser.TokenType.CAMERA,
-                value='camera:',
-                line_number=10
-            ),
-            time=shapescape_dialogue_2.parser.TimeNode(
-                settings=[],
-                messages=[
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='blank',
-                        text_nodes=[],
-                        command_nodes=[
-                            shapescape_dialogue_2.parser.CommandNode(
-                                text='scorebard players set @a force 0',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                    value='scorebard players set @a force 0',
-                                    line_number=17
-                                )
-                            )
-                        ],
-                        schedule_nodes=[
-                            shapescape_dialogue_2.parser.ScheduleNode(
-                                command_nodes=[
-                                    shapescape_dialogue_2.parser.CommandNode(
-                                        text='execute @a[type=shapescape:clone] ~ '
-                                            '~ ~  function order_66',
-                                        token=shapescape_dialogue_2.parser.Token(
-                                            token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                            value='execute '
-                                                '@a[type=shapescape:clone] ~ ~ ~  '
-                                                'function order_66',
-                                            line_number=21
-                                        )
-                                    )
-                                ],
-                                settings=[
-                                    shapescape_dialogue_2.parser.SettingNode(
-                                        name='time',
-                                        value='2.3',
-                                        token=shapescape_dialogue_2.parser.Token(
-                                            token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                            value=shapescape_dialogue_2.parser.Setting(
-                                                name='time',
-                                                value='2.3'
-                                            ),
-                                            line_number=20
-                                        )
-                                    )
-                                ],
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SCHEDULE,
-                                    value='schedule:',
-                                    line_number=20
-                                )
-                            )
-                        ],
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='time',
-                                value='1',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='time',
-                                        value='1'
-                                    ),
-                                    line_number=16
-                                )
-                            )
-                        ],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
-                            value='blank:',
-                            line_number=16
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.6.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.6.ogg'
                         ),
-                        run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
-                            command_nodes=[
-                                shapescape_dialogue_2.parser.CommandNode(
-                                    text='summon shapescape:obi_wan 1 2 3',
-                                    token=shapescape_dialogue_2.parser.Token(
-                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                        value='summon shapescape:obi_wan 1 2 3',
-                                        line_number=19
-                                    )
-                                )
-                            ],
-                            token=shapescape_dialogue_2.parser.Token(
-                                token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
-                                value='run_once:',
-                                line_number=18
-                            )
-                        ),
-                        on_exit_node=shapescape_dialogue_2.parser.OnExitNode(
-                            command_nodes=[
-                                shapescape_dialogue_2.parser.CommandNode(
-                                    text='event entity @e[type=shapescape:obi_wan] '
-                                        'remove_high_ground',
-                                    token=shapescape_dialogue_2.parser.Token(
-                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                        value='event entity '
-                                            '@e[type=shapescape:obi_wan] '
-                                            'remove_high_ground',
-                                        line_number=23
-                                    )
-                                )
-                            ],
-                            token=shapescape_dialogue_2.parser.Token(
-                                token_type=shapescape_dialogue_2.parser.TokenType.ON_EXIT,
-                                value='on_exit:',
-                                line_number=22
-                            )
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='tell',
-                        text_nodes=[
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='[Obi-Wan] Hello there!',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='[Obi-Wan] Hello there!',
-                                    line_number=25
-                                )
-                            )
-                        ],
-                        command_nodes=[],
-                        schedule_nodes=[],
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='obi_wan:hello.ogg',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='obi_wan:hello.ogg'
-                                    ),
-                                    line_number=24
-                                )
-                            )
-                        ],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.TELL,
-                            value='tell:',
-                            line_number=24
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='tell',
-                        text_nodes=[
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='[Grevious] General Kenobi!',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='[Grevious] General Kenobi!',
-                                    line_number=27
-                                )
-                            ),
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='[this is just an example...] This is a '
-                                    'multiline text.',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='[this is just an example...] This is a '
-                                        'multiline text.',
-                                    line_number=28
-                                )
-                            )
-                        ],
-                        command_nodes=[],
-                        schedule_nodes=[],
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='wpm',
-                                value='90',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='wpm',
-                                        value='90'
-                                    ),
-                                    line_number=26
-                                )
-                            ),
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='grevious:general_kenobi.ogg',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='grevious:general_kenobi.ogg'
-                                    ),
-                                    line_number=26
-                                )
-                            )
-                        ],
-                        loop_nodes=[
-                            shapescape_dialogue_2.parser.LoopNode(
-                                command_nodes=[
-                                    shapescape_dialogue_2.parser.CommandNode(
-                                        text='playsound grevious.cough',
-                                        token=shapescape_dialogue_2.parser.Token(
-                                            token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                            value='playsound grevious.cough',
-                                            line_number=30
-                                        )
-                                    )
-                                ],
-                                settings=[
-                                    shapescape_dialogue_2.parser.SettingNode(
-                                        name='time',
-                                        value='0.1',
-                                        token=shapescape_dialogue_2.parser.Token(
-                                            token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                            value=shapescape_dialogue_2.parser.Setting(
-                                                name='time',
-                                                value='0.1'
-                                            ),
-                                            line_number=29
-                                        )
-                                    )
-                                ],
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.LOOP,
-                                    value='loop:',
-                                    line_number=29
-                                )
-                            )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.TELL,
-                            value='tell:',
-                            line_number=26
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='title',
-                        text_nodes=[
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='Bossfight!',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='Bossfight!',
-                                    line_number=32
-                                )
-                            ),
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='This is a subtitle.',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='This is a subtitle.',
-                                    line_number=33
-                                )
-                            )
-                        ],
-                        command_nodes=[
-                            shapescape_dialogue_2.parser.CommandNode(
-                                text='scoreboard players set @a force 100',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                    value='scoreboard players set @a force 100',
-                                    line_number=34
-                                )
-                            )
-                        ],
-                        schedule_nodes=[],
-                        settings=[],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.TITLE,
-                            value='title:',
-                            line_number=31
-                        ),
-                        run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
-                            command_nodes=[
-                                shapescape_dialogue_2.parser.CommandNode(
-                                    text='music play bossfight',
-                                    token=shapescape_dialogue_2.parser.Token(
-                                        token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
-                                        value='music play bossfight',
-                                        line_number=36
-                                    )
-                                )
-                            ],
-                            token=shapescape_dialogue_2.parser.Token(
-                                token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
-                                value='run_once:',
-                                line_number=35
-                            )
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='actionbar',
-                        text_nodes=[
-                            shapescape_dialogue_2.parser.TextNode(
-                                text='Objective: kill General Grevious',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='Objective: kill General Grevious',
-                                    line_number=38
-                                )
-                            )
-                        ],
-                        command_nodes=[],
-                        schedule_nodes=[],
-                        settings=[],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
-                            value='actionbar:',
-                            line_number=37
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='tell',
-                        text_nodes=[
-                            shapescape_dialogue_2.parser.TextNode(
-                                text="[Narrator] And they started to fight and "
-                                    "this line is just to add a really long quote "
-                                    "to test how the generator handles it. This "
-                                    "should significantly increase the length of "
-                                    "the animaiton. I hope the generator wont die "
-                                    "from generating so much /tp commands. We'll "
-                                    "see. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text. More text. More "
-                                    "text. More text. More text.",
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value="[Narrator] And they started to fight and "
-                                        "this line is just to add a really long "
-                                        "quote to test how the generator handles "
-                                        "it. This should significantly increase "
-                                        "the length of the animaiton. I hope the "
-                                        "generator wont die from generating so "
-                                        "much /tp commands. We'll see. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text. More text. "
-                                        "More text. More text. More text. More "
-                                        "text. More text. More text.",
-                                    line_number=40
-                                )
-                            )
-                        ],
-                        command_nodes=[],
-                        schedule_nodes=[],
-                        settings=[],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.TELL,
-                            value='tell:',
-                            line_number=39
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.MessageNode(
-                        node_type='blank',
-                        text_nodes=[],
-                        command_nodes=[],
-                        schedule_nodes=[],
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/rd2d/beep_boop.ogg',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/rd2d/beep_boop.ogg'
-                                    ),
-                                    line_number=41
-                                )
-                            ),
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='time',
-                                value='1',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='time',
-                                        value='1'
-                                    ),
-                                    line_number=41
-                                )
-                            )
-                        ],
-                        loop_nodes=[],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
-                            value='blank:',
-                            line_number=41
-                        )
+                        line_number=13
                     )
-                ],
-                token=shapescape_dialogue_2.parser.Token(
-                    token_type=shapescape_dialogue_2.parser.TokenType.TIME,
-                    value='time:',
-                    line_number=15
                 )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=13
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Jonah] No time for philosophy right now!',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Jonah] No time for philosophy right now!',
+                        line_number=16
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.7.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.7.ogg'
+                        ),
+                        line_number=15
+                    )
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=15
+            )
+        ),
+        shapescape_dialogue_2.parser.MessageNode(
+            node_type='actionbar',
+            text_nodes=[
+                shapescape_dialogue_2.parser.TextNode(
+                    text='[Piper] You started it...',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
+                        value='[Piper] You started it...',
+                        line_number=18
+                    )
+                )
+            ],
+            command_nodes=[],
+            schedule_nodes=[],
+            settings=[
+                shapescape_dialogue_2.parser.SettingNode(
+                    name='sound',
+                    value='zmd/female.8.ogg',
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                        value=shapescape_dialogue_2.parser.Setting(
+                            name='sound',
+                            value='zmd/female.8.ogg'
+                        ),
+                        line_number=17
+                    )
+                )
+            ],
+            loop_nodes=[],
+            token=shapescape_dialogue_2.parser.Token(
+                token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
+                value='actionbar:',
+                line_number=17
             )
         )
     ],
@@ -627,12 +254,12 @@ shapescape_dialogue_2.parser.RootAstNode(
         settings=[
             shapescape_dialogue_2.parser.SettingNode(
                 name='wpm',
-                value='120',
+                value='30',
                 token=shapescape_dialogue_2.parser.Token(
                     token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
                     value=shapescape_dialogue_2.parser.Setting(
                         name='wpm',
-                        value='120'
+                        value='30'
                     ),
                     line_number=1
                 )
@@ -654,123 +281,6 @@ shapescape_dialogue_2.parser.RootAstNode(
             token_type=shapescape_dialogue_2.parser.TokenType.SETTINGS,
             value='settings:',
             line_number=1
-        )
-    ),
-    sound_profiles=shapescape_dialogue_2.parser.SoundProfilesNode(
-        sound_profiles=[
-            shapescape_dialogue_2.parser.SoundProfileNode(
-                name='male',
-                sound_profile_variants=[
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='obi_wan',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/obi_wan/male',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/obi_wan/male'
-                                    ),
-                                    line_number=4
-                                )
-                            )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='obi_wan',
-                            line_number=4
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='grevious',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/grevious/male',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/grevious/male'
-                                    ),
-                                    line_number=5
-                                )
-                            )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='grevious',
-                            line_number=5
-                        )
-                    )
-                ],
-                token=shapescape_dialogue_2.parser.Token(
-                    token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                    value='male',
-                    line_number=3
-                )
-            ),
-            shapescape_dialogue_2.parser.SoundProfileNode(
-                name='female',
-                sound_profile_variants=[
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='obi_wan',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/obi_wan/female',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/obi_wan/female'
-                                    ),
-                                    line_number=7
-                                )
-                            )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='obi_wan',
-                            line_number=7
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='grevious',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/grevious/apache_helicopter',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/grevious/apache_helicopter'
-                                    ),
-                                    line_number=8
-                                )
-                            )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='grevious',
-                            line_number=8
-                        )
-                    )
-                ],
-                token=shapescape_dialogue_2.parser.Token(
-                    token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                    value='female',
-                    line_number=6
-                )
-            )
-        ],
-        token=shapescape_dialogue_2.parser.Token(
-            token_type=shapescape_dialogue_2.parser.TokenType.SOUND_PROFILES,
-            value='sound_profiles:',
-            line_number=2
         )
     )
 )

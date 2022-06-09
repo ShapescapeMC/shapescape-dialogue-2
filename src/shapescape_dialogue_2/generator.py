@@ -159,7 +159,7 @@ class LangFileWriter:
             f.write('\n'.join(data))
 
 @dataclass
-class SoundsJsonWriter:
+class SoundDefinitionsJsonWriter:
     path: Path
     data: dict[str, Any]
 
@@ -324,7 +324,11 @@ class BpacGenerator:
                         {f"{name}_s0": "1.0"}
                     ]
                 },
-                "end": {}
+                "end": {
+                    "on_entry": [
+                        "@s despawn"
+                    ]
+                }
             }
         }
         # Populate the states with animations
@@ -334,14 +338,17 @@ class BpacGenerator:
             if i == len_timeline - 1:
                 next_state = "end"
             else:
-                next_state = f"s{i + 1}"
+                next_state = f"{name}_s{i + 1}"
             # Generate animations and their names for this data structure
             animation_names: list[str] = []
             for j, animation_timeline in enumerate(state):
                 animation_name = f'{state_name}_{j}'
                 generation_settings.bpa_generator.add_writer(
                     animation_name, animation_timeline, generation_settings)
-                animation_names.append(animation_name)
+                # Ugly hack, getting the name of the animation from the
+                # recently added writer
+                animation_names.append(
+                    generation_settings.bpa_generator.writers[-1].name)
             data['states'][state_name] = {
                 "transitions": [
                     {next_state: "q.all_animations_finished"}
@@ -375,12 +382,12 @@ class BpEntityGenerator:
                         anim.name: BpaWriter.get_full_name(anim.name)
                         for anim in generation_settings.bpa_generator.writers
                     } | {
-                        ac.name: BpacWriter.get_full_name(ac.name)
+                        f"{ac.name}_controller": BpacWriter.get_full_name(ac.name)
                         for ac in generation_settings.bpac_generator.writers
                     },
                     "scripts": {
                         "animate": [
-                            {ac.name: f"q.variant == {i}"}
+                            {f"{ac.name}_controller": f"q.variant == {i}"}
                             for i, ac in enumerate(
                                 generation_settings.bpac_generator.writers)
                         ]
@@ -436,7 +443,7 @@ class BpEntityGenerator:
             scripts_animate.append({ac.name: f"q.variant == {i}"})
             # Add corresponding component groups
             data['minecraft:entity']['component_groups'][f'{ac.name}'] = {
-                "minecraft:version": {
+                "minecraft:variant": {
                     "value": i
                 }
             }
@@ -475,7 +482,7 @@ class DialogueGenerator:
 
     sc_provider: SoundCodeProvider = field(default_factory=SoundCodeProvider)
 
-    sounds_json_writer: Optional[SoundsJsonWriter] = None
+    sounds_definitions_writer: Optional[SoundDefinitionsJsonWriter] = None
     lang_file_writer: Optional[LangFileWriter] = None
 
     def generate(self, tree: RootAstNode):
@@ -484,7 +491,7 @@ class DialogueGenerator:
                 sound_profile: Optional[SoundProfileNode]):
             config_provider = ConfigProvider(tree.settings, sound_profile)
             ac_timeline = AnimationControllerTimeline.from_timeline_nodes(
-                tree.timeline, config_provider)
+                tree.timeline, config_provider, self.rp_path)
             # Bpac generator generates, bpac, anim and mcfunctions
             self.bpac_generator.add_writer(
                 sound_profile_name, ac_timeline, self)
@@ -506,10 +513,11 @@ class DialogueGenerator:
         self.sc_provider.inspect_sound_paths(self.rp_path)
         for k, v in self.sc_provider.walk_names():
             sounds_data[k] = {
+                "category": "music",
                 "sounds": [v]
             }
             
-        self.sounds_json_writer = SoundsJsonWriter(
+        self.sounds_definitions_writer = SoundDefinitionsJsonWriter(
             self.rp_path / 'sounds/sound_definitions.json', sounds_data)
         # Generate en_us.lang file
         translation_data = self.tc_provider.get_translation_file()
@@ -527,5 +535,5 @@ class DialogueGenerator:
             writer.save()
         for writer in self.bp_entity_generator.writers:
             writer.save()
-        self.sounds_json_writer.save()
+        self.sounds_definitions_writer.save()
         self.lang_file_writer.save()

@@ -1,0 +1,18 @@
+settings: wpm=30 title_max=15
+## No sound profiles in this project.
+
+
+actionbar: sound=zmd/female.2.ogg
+    >[Piper] A FRANKENPLUSH!
+actionbar: sound=zmd/female.3.ogg
+    >[Jonah] Correction: Frankenplush's Monster.
+actionbar: sound=zmd/female.4.ogg
+    >[Jonah] Frankenstein was the maker, not the monster itself.
+actionbar: sound=zmd/female.5.ogg
+    >[Piper] Yeah, yeah, smarty-pants. 
+actionbar: sound=zmd/female.6.ogg
+    >[Piper] But maybe Frankenstein was the monster because he created the so-called monster.
+actionbar: sound=zmd/female.7.ogg
+    >[Jonah] No time for philosophy right now!
+actionbar: sound=zmd/female.8.ogg
+    >[Piper] You started it...

@@ -114,12 +114,12 @@ class SoundCodeProvider:
             path = k.with_suffix("").as_posix()
             yield v, path
 
-    def inspect_sound_paths(self, root: Path) -> None:
+    def inspect_sound_paths(self, rp_path: Path) -> None:
         for path, key in self._cached_names.items():
-            if not (root / path).exists():
+            if not (rp_path / path).exists():
                 print(
                     f"WARNING: The sound definition {key} has a reference "
-                    f"to a path that doesn't exist {(root / path).as_posix()}",
+                    f"to a path that doesn't exist {(rp_path / path).as_posix()}",
                     file=sys.stderr)
 
 class ConfigProvider:
@@ -175,7 +175,8 @@ class ConfigProvider:
             sound_profile_dict[variant.name] = Path(settings['sound'])
         return sound_profile_dict
 
-    def message_node_duration(self, message_node: MessageNode) -> int:
+    def message_node_duration(
+            self, message_node: MessageNode, rp_path: Path) -> int:
         '''
         Message node duration decides how to calculate the duration of an
         message event and returns its value in Minecraft ticks. If it's
@@ -220,7 +221,7 @@ class ConfigProvider:
         if 'sound' in node_settings:
             sound_path = self.resolve_sound_path(
                 node_settings['sound'], message_node)
-            duration = sound_duration(sound_path)
+            duration = sound_duration(rp_path / sound_path)
             if duration is not None:
                 return tick(duration)
         # 'wpm' and 'cpm' shouldn't give errors from 'blank' message nodes
@@ -273,7 +274,7 @@ class ConfigProvider:
             sound_path = self.sound_profile[sound_variant] / sound_name
         else:
             sound_path = Path(sound)
-        return sound_path
+        return Path("sounds") / sound_path
 
 @dataclass
 class TimelineEventAction:
@@ -299,22 +300,22 @@ class TimelineEventAction:
         elif self.action_type == "title":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                'titleraw @a title'
+                'titleraw @a title '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "actionbar":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                'titleraw @a actionbar'
+                'titleraw @a actionbar '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "subtitle":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
-                'titleraw @a subtitle'
+                'titleraw @a subtitle '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "command":
             return self.value
         elif self.action_type == "playsound":
-            return f'playsound {sc_provider.get_sound_code(Path(self.value))}'
+            return f'playsound {sc_provider.get_sound_code(Path(self.value))} @a'
         else:
             raise ValueError(f"Unknown action type: {self.action_type}")
 
@@ -346,7 +347,8 @@ class AnimationTimeline:
     @staticmethod
     def from_message_node_list(
             settings: ConfigProvider,
-            timeline_nodes: list[MessageNode]) -> AnimationTimeline:
+            timeline_nodes: list[MessageNode],
+            rp_path: Path) -> AnimationTimeline:
         '''
         Creates a AnimationTimeline from a list of MessageNodes.
         '''
@@ -361,7 +363,7 @@ class AnimationTimeline:
         # ticks
         time: int = 0
         for node in timeline_nodes:
-            duration = settings.message_node_duration(node)
+            duration = settings.message_node_duration(node, rp_path)
             optional_sound_node = settings.try_get_sound_timeline_event_action(
                 node)
             if optional_sound_node is not None:
@@ -625,8 +627,8 @@ class AnimationControllerTimeline:
     @staticmethod
     def from_timeline_nodes(
             timeline: list[Union[MessageNode, DialogueNode, CameraNode]],
-            config_provider: ConfigProvider
-            ) -> AnimationControllerTimeline:
+            config_provider: ConfigProvider,
+            rp_path: Path) -> AnimationControllerTimeline:
         events: list[tuple[AnimationTimeline, ...]] = []
         timeline_deque = deque(timeline)
         while len(timeline_deque) > 0:
@@ -635,9 +637,12 @@ class AnimationControllerTimeline:
                 message_nodes: list[MessageNode] = []
                 while isinstance(node, MessageNode):
                     message_nodes.append(node)
+                    if len(timeline_deque) <= 0:
+                        break
                     timeline_deque.popleft()
+                    node = timeline_deque[0]
                 animation_timeline = AnimationTimeline.from_message_node_list(
-                    config_provider, message_nodes)
+                    config_provider, message_nodes, rp_path)
                 events.append((animation_timeline,))
                 # TODO - create animation timeline from message nodes
             elif isinstance(node, DialogueNode):
@@ -656,7 +661,7 @@ class AnimationControllerTimeline:
                             f"Line: {node.token.line_number}")
                     messages_timeline = (
                         AnimationTimeline.from_message_node_list(
-                            config_provider, node.time.messages)
+                            config_provider, node.time.messages, rp_path)
                     )
                     time = messages_timeline.time
                 else:

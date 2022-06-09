@@ -9,7 +9,8 @@ import math
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Iterable, Literal, Optional, Union
+import sys
 
 import numpy as np
 import scipy.interpolate
@@ -99,9 +100,27 @@ class SoundCodeProvider:
         try:
             return self._cached_names[sound_path]
         except KeyError:
-            result = '.'.join(sound_path.parts)
+            # with_suffix removes the .ogg extension from the name
+            result = '.'.join(sound_path.with_suffix("").parts)
             self._cached_names[sound_path] = result
             return result
+
+    def walk_names(self) -> Iterable[tuple[str, str]]:
+        '''
+        Returns the keys and the values of the names in cache, ready to be
+        used in the sound_definitions.json file.
+        '''
+        for k, v in self._cached_names.items():
+            path = k.with_suffix("").as_posix()
+            yield v, path
+
+    def inspect_sound_paths(self, root: Path) -> None:
+        for path, key in self._cached_names.items():
+            if not (root / path).exists():
+                print(
+                    f"WARNING: The sound definition {key} has a reference "
+                    f"to a path that doesn't exist {(root / path).as_posix()}",
+                    file=sys.stderr)
 
 class ConfigProvider:
     '''
@@ -109,9 +128,11 @@ class ConfigProvider:
     The configuratino includes the global settings and a sound profile.
     '''
     def __init__(
-            self, settings: SettingsNode,
+            self, settings: Optional[SettingsNode],
             sound_profile: Optional[SoundProfileNode]=None):
-        self.settings = ConfigProvider.parse_settings(settings.settings)
+        self.settings = (
+            {} if settings is None else
+            ConfigProvider.parse_settings(settings.settings))
         self.sound_profile: Optional[dict[str, Path]] = (
             None if sound_profile is None else
             ConfigProvider.parse_sound_profile(sound_profile))
@@ -270,7 +291,7 @@ class TimelineEventAction:
         '''
         Returns the command to be executed in Minecraft sequence.
         '''
-        if self.action_type == "tellraw":
+        if self.action_type == "tell":
             translation_code = tc_provider.get_translation_code(self.value)
             return  (
                 'tellraw @a '
@@ -591,15 +612,15 @@ class AnimationControllerTimeline:
     which sequentially plays the animations (from AnimationTimeline objects)
     using the 'q.all_animations_finished' Molang query.
 
-    The events from the AnimationControllerTimeline are grouped together in
+    The states from the AnimationControllerTimeline are grouped together in
     as little groups as possible. Jump between animation states may cause
     creation of multiple timelines.
 
-    The events list is a list of tuples of AnimationTimeline objects. The
+    The states list is a list of tuples of AnimationTimeline objects. The
     AnimationTimelines groupped together in the same tuple are intended to
     be played simultaneously during the same state.
     '''
-    events: list[tuple[AnimationTimeline, ...]]
+    states: list[tuple[AnimationTimeline, ...]]
 
     @staticmethod
     def from_timeline_nodes(

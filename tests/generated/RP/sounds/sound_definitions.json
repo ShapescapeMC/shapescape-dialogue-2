@@ -1,0 +1,30 @@
+{
+	"format_version": "1.14.0",
+	"sound_definitions": {
+		"starwars.obi_wan.male.hello": {
+			"sounds": [
+				"starwars/obi_wan/male/hello"
+			]
+		},
+		"starwars.grevious.male.general_kenobi": {
+			"sounds": [
+				"starwars/grevious/male/general_kenobi"
+			]
+		},
+		"starwars.rd2d.beep_boop": {
+			"sounds": [
+				"starwars/rd2d/beep_boop"
+			]
+		},
+		"starwars.obi_wan.female.hello": {
+			"sounds": [
+				"starwars/obi_wan/female/hello"
+			]
+		},
+		"starwars.grevious.apache_helicopter.general_kenobi": {
+			"sounds": [
+				"starwars/grevious/apache_helicopter/general_kenobi"
+			]
+		}
+	}
+}

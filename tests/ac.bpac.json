@@ -1,0 +1,32 @@
+{
+    "format_version": "1.17.0",
+    "animation_controllers": {
+        "controller.animation.example": {
+            "initial_state": "default",
+            "states": {
+                "default": {
+                    "transitions": [
+                        {"state1": "1.0"}
+                    ]
+                },
+                "state1": {
+                    "transitions": [
+                        {"state2": "q.all_animations_finished"}
+                    ],
+                    "animations": [
+                        "state2", "state2_camera"
+                    ]
+                },
+                "state2": {
+                    "transitions": [
+                        {"state3": "q.all_animations_finished"}
+                    ],
+                    "animations": [
+                        "state3"
+                    ]
+                },
+                "end": {}
+            }
+        }
+    }
+}

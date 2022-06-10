@@ -6,11 +6,11 @@ the AST to a format that is used for the code generation.
 from __future__ import annotations
 
 import math
+import sys
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Literal, Optional, Union
-import sys
 
 import numpy as np
 import scipy.interpolate
@@ -21,13 +21,6 @@ from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesRotated, DialogueNode, MessageNode,
                      SettingsList, SettingsNode, SoundProfileNode)
 
-
-def tick(duration: Union[float, str, int]) -> int:
-    '''
-    Converts duration in seconds to tick count. The values are always rounded
-    up.
-    '''
-    return int(math.ceil(float(duration) * 20))
 
 class CompileError(Exception):
     '''
@@ -199,7 +192,7 @@ class ConfigProvider:
         node_settings = ConfigProvider.parse_settings(message_node.settings)
         # Try using local settings
         if 'time' in node_settings:
-            return tick(node_settings['time'])
+            return seconds_to_ticks(node_settings['time'])
         if 'wpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'wpm')
@@ -208,7 +201,7 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'wpm')
-            return tick(wpm_duration(full_text, wpm))
+            return seconds_to_ticks(wpm_duration(full_text, wpm))
         if 'cpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'cpm')
@@ -217,19 +210,19 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'cpm')
-            return tick(cpm_duration(full_text, cpm))
+            return seconds_to_ticks(cpm_duration(full_text, cpm))
         if 'sound' in node_settings:
             sound_path = self.resolve_sound_path(
                 node_settings['sound'], message_node)
             duration = sound_duration(rp_path / sound_path)
             if duration is not None:
-                return tick(duration)
+                return seconds_to_ticks(duration)
         # 'wpm' and 'cpm' shouldn't give errors from 'blank' message nodes
         # if these properties are implemented in global settings
         if 'wpm' in self.settings and message_node.node_type != 'blank':
-            return tick(wpm_duration(full_text, float(self.settings['wpm'])))
+            return seconds_to_ticks(wpm_duration(full_text, float(self.settings['wpm'])))
         if 'cpm' in self.settings and message_node.node_type != 'blank':
-            return tick(cpm_duration(full_text, float(self.settings['cpm'])))
+            return seconds_to_ticks(cpm_duration(full_text, float(self.settings['cpm'])))
         # TODO - Should I use 'time' property from global settings? Should
         # the local and global settings be converted to a proper type before
         # we reach this point?
@@ -354,7 +347,7 @@ class AnimationTimeline:
         '''
         events: dict[int, TimelineEvent] = {}
 
-        def add_event_action(time: int, *actions: TimelineEventAction):
+        def add_event_action(time: int, *actions: TimelineEventAction) -> None:
             if time not in events:
                 events[time] = TimelineEvent(actions=[])
             events[time].actions.extend(actions)
@@ -413,7 +406,7 @@ class AnimationTimeline:
                 ]
                 add_event_action(time + duration, *on_exit_actions)
             for schedule_node in node.schedule_nodes:
-                schedule_time = tick(  # Should be safe (parser checks that)
+                schedule_time = seconds_to_ticks(  # Should be safe (parser checks that)
                     ConfigProvider.parse_settings(
                         schedule_node.settings)['time'])
                 scheduled_actions = [
@@ -422,7 +415,7 @@ class AnimationTimeline:
                 ]
                 add_event_action(time + schedule_time, *scheduled_actions)
             for loop_node in node.loop_nodes:
-                loop_time = tick(  # This should be safe (parser checks that)
+                loop_time = seconds_to_ticks(  # This should be safe (parser checks that)
                     ConfigProvider.parse_settings(
                         loop_node.settings)['time'])
                 if loop_time <= 0:
@@ -498,7 +491,7 @@ class AnimationTimeline:
     @staticmethod
     def _get_tp_suffixes_crds_rotated(
             frames_stack: deque[tuple[int, CoordinatesNode]],
-            ouptut: dict[int, str], spline_fit_degree: int):
+            ouptut: dict[int, str], spline_fit_degree: int) -> None:
         '''
         Used by from_coordinates_list.
 
@@ -535,7 +528,7 @@ class AnimationTimeline:
     @staticmethod
     def _get_tp_suffixes_crds_facing_crds(
             frames_stack: deque[tuple[int, CoordinatesNode]],
-            ouptut: dict[int, str], spline_fit_degree: int):
+            ouptut: dict[int, str], spline_fit_degree: int) -> None:
         '''
         Used by from_coordinates_list.
 
@@ -573,37 +566,6 @@ class AnimationTimeline:
         # Repeat the last frame until the next frame
         for frame in range(last_frame, next_frame):
             ouptut[int(frame)] = output_value
-
-def b_spline_magic(
-        y: list[float], x_start: float, x_end: float,
-        n_points: int, k: int=3) -> tuple[list[float], list[float]]:
-    '''
-    The b_spline_magic function uses science to magically calculate evenly
-    separated points on a B-spline of 'k' degree that goes through xy points.
-    The 'x' values are calculated from 'x_start', 'x_end' and
-    'n_points'. They evenly distributed between start and end.
-
-    Returns two lists of coordinates, the first one is for x and the secod is
-    for y.
-
-    - k=1 - linear
-    - k=2 - quadratic
-    - k=3 - cubic
-    ...goes up to 5
-    '''
-    # Useful links:
-    # https://www.delftstack.com/howto/python/python-spline/
-    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.splev.html
-    x = np.linspace(x_start, x_end, len(y))
-
-    # B-spline magic
-    tck = scipy.interpolate.splrep(x, y, s=0, k=k)
-    x_fit = np.linspace(x_start, x_end, n_points)
-    y_fit = scipy.interpolate.splev(x_fit, tck, der=0)
-
-    # Recast that to lists of floats just to make sure that errors are
-    # detected early.
-    return [float(x) for x in x_fit], [float(y) for y in y_fit]
 
 @dataclass
 class AnimationControllerTimeline:
@@ -644,7 +606,6 @@ class AnimationControllerTimeline:
                 animation_timeline = AnimationTimeline.from_message_node_list(
                     config_provider, message_nodes, rp_path)
                 events.append((animation_timeline,))
-                # TODO - create animation timeline from message nodes
             elif isinstance(node, DialogueNode):
                 raise NotImplementedError()
             elif isinstance(node, CameraNode):
@@ -671,7 +632,7 @@ class AnimationControllerTimeline:
                             " the 'time' setting is required. "
                             f"Line: {node.token.line_number}")
                     try:
-                        time = tick(time_settings['time'])
+                        time = seconds_to_ticks(time_settings['time'])
                     except ValueError:
                         raise CompileError(
                             "Unable to convert the 'time' property to a "
@@ -690,3 +651,40 @@ class AnimationControllerTimeline:
                 raise ValueError(f"Unknown node type: {node}")
         return AnimationControllerTimeline(events)
 
+def seconds_to_ticks(duration: Union[float, str, int]) -> int:
+    '''
+    Converts duration in seconds to tick count. The values are always rounded
+    up.
+    '''
+    return int(math.ceil(float(duration) * 20))
+
+def b_spline_magic(
+        y: list[float], x_start: float, x_end: float,
+        n_points: int, k: int=3) -> tuple[list[float], list[float]]:
+    '''
+    The b_spline_magic function uses science to magically calculate evenly
+    separated points on a B-spline of 'k' degree that goes through xy points.
+    The 'x' values are calculated from 'x_start', 'x_end' and
+    'n_points'. They evenly distributed between start and end.
+
+    Returns two lists of coordinates, the first one is for x and the secod is
+    for y.
+
+    - k=1 - linear
+    - k=2 - quadratic
+    - k=3 - cubic
+    ...goes up to 5
+    '''
+    # Useful links:
+    # https://www.delftstack.com/howto/python/python-spline/
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.splev.html
+    x = np.linspace(x_start, x_end, len(y))
+
+    # B-spline magic
+    tck = scipy.interpolate.splrep(x, y, s=0, k=k)
+    x_fit = np.linspace(x_start, x_end, n_points)
+    y_fit = scipy.interpolate.splev(x_fit, tck, der=0)
+
+    # Recast that to lists of floats just to make sure that errors are
+    # detected early.
+    return [float(x) for x in x_fit], [float(y) for y in y_fit]

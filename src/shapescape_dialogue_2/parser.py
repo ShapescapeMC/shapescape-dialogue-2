@@ -361,7 +361,7 @@ class RootAstNode:
     sound_profiles: Optional[SoundProfilesNode] = None
 
     @staticmethod
-    def from_token_stack(tokens: deque[Token]):
+    def from_token_stack(tokens: deque[Token]) -> RootAstNode:
         token = tokens[0]
         # Settings
         settings = None
@@ -412,8 +412,8 @@ class SettingsNode:
     @staticmethod
     def parse_settings(
             tokens: deque[Token], *,
-            expected_settings: dict[str, Callable[[Any], Any]]=None,
-            accepted_settings: dict[str, Callable[[Any], Any]]=None
+            expected_settings: Optional[dict[str, Callable[[Any], Any]]]=None,
+            accepted_settings: Optional[dict[str, Callable[[Any], Any]]]=None
     ) -> SettingsList:
         '''
         Parse settings is a helper function used to parse settings of any
@@ -754,9 +754,12 @@ class CameraNode:
         if token.token_type is not TokenType.TIME:
             raise ParseError.from_unexpected_token(token, TokenType.TIME)
         time = TimeNode.from_token_stack(tokens)
+
+        #  Why was this here? This type was impossible due to the previous 
+        # check:
         # Expecte DEDENT or EOF, don't pop EOF
-        if token.token_type is TokenType.DEDENT:
-            tokens.popleft()
+        # if token.token_type is TokenType.DEDENT:
+        #     tokens.popleft()
         return CameraNode(coordinates, root_token, time)
 
 @dataclass

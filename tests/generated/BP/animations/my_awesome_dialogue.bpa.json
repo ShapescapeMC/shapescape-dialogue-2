@@ -1,0 +1,53 @@
+{
+	"format_version": "1.18.0",
+	"animations": {
+		"animation.my_awesome_dialogue.female_s0_1": {
+			"loop": false,
+			"animation_length": 4.75,
+			"timeline": {
+				"0.0": [
+					"/scorebard players set @a force 0"
+				],
+				"1.0": [
+					"/function my_awesome_dialogue/female_s0_1_20"
+				],
+				"1.5": [
+					"/function my_awesome_dialogue/female_s0_1_30"
+				],
+				"1.6": [
+					"/playsound grevious.cough"
+				],
+				"1.7": [
+					"/playsound grevious.cough"
+				],
+				"1.8": [
+					"/playsound grevious.cough"
+				],
+				"1.9": [
+					"/playsound grevious.cough"
+				],
+				"2.0": [
+					"/playsound grevious.cough"
+				],
+				"2.1": [
+					"/playsound grevious.cough"
+				],
+				"2.2": [
+					"/function my_awesome_dialogue/female_s0_1_44"
+				],
+				"2.3": [
+					"/execute @a[type=shapescape:clone] ~ ~ ~  function order_66"
+				],
+				"2.7": [
+					"/titleraw @a actionbar {\"rawtext\":[{\"translate\":\"dialogue.my_awesome_dialogue.6\"}]}"
+				],
+				"3.2": [
+					"/tellraw @a {\"rawtext\":[{\"translate\":\"dialogue.my_awesome_dialogue.7\"}]}"
+				],
+				"3.7": [
+					"/playsound sounds.starwars.rd2d.beep_boop @a"
+				]
+			}
+		}
+	}
+}

@@ -1,13 +1,13 @@
 {
 	"format_version": "1.17.0",
 	"animation_controllers": {
-		"controller.animation.zmd_dialogue.default": {
+		"controller.animation.my_awesome_dialogue.female": {
 			"initial_state": "default",
 			"states": {
 				"default": {
 					"transitions": [
 						{
-							"default_s0": "1.0"
+							"female_s0": "1.0"
 						}
 					]
 				},
@@ -16,14 +16,15 @@
 						"@s despawn"
 					]
 				},
-				"default_s0": {
+				"female_s0": {
 					"transitions": [
 						{
 							"end": "q.all_animations_finished"
 						}
 					],
 					"animations": [
-						"zmd_dialogue.default_s0_0"
+						"my_awesome_dialogue.female_s0_0",
+						"my_awesome_dialogue.female_s0_1"
 					]
 				}
 			}

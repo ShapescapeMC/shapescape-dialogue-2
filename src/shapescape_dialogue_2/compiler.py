@@ -111,8 +111,9 @@ class SoundCodeProvider:
         for path, key in self._cached_names.items():
             if not (rp_path / path).exists():
                 print(
-                    f"WARNING: The sound definition {key} has a reference "
-                    f"to a path that doesn't exist {(rp_path / path).as_posix()}",
+                    f"WARNING: The sound definition '{key}' has a reference "
+                    f"to a path that doesn't exist:\n"
+                    f"\t'{(rp_path / path).as_posix()}'",
                     file=sys.stderr)
 
 class ConfigProvider:

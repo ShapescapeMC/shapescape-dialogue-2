@@ -602,8 +602,8 @@ class AnimationControllerTimeline:
                     message_nodes.append(node)
                     if len(timeline_deque) <= 0:
                         break
-                    timeline_deque.popleft()
                     node = timeline_deque[0]
+                    timeline_deque.popleft()
                 animation_timeline = AnimationTimeline.from_message_node_list(
                     config_provider, message_nodes, rp_path)
                 events.append((animation_timeline,))

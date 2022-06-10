@@ -62,9 +62,10 @@ class BpacWriter:
         '''
         Saves the data of the behavior pack animation controller into the file.
         '''
+        full_path = bp_path / 'animation_controllers' / self.path
         # Get the existing file data or use the default if it doesn't exist
         full_file_content = try_load_json_resource(
-            self.path, 'animation controller')
+            full_path, 'animation controller')
         if full_file_content is None:
             full_file_content = {
                 "format_version": "1.17.0", "animation_controllers": {}
@@ -84,7 +85,6 @@ class BpacWriter:
         full_file_content['animation_controllers'][full_identifier] = self.data
 
         # Save the data
-        full_path = bp_path / 'animation_controllers' / self.path
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with full_path.open('w', encoding='utf8') as f:
             json.dump(full_file_content, f, indent='\t', ensure_ascii=False)
@@ -110,9 +110,10 @@ class BpaWriter:
         '''
         Saves the data of the behavior pack animation into the file.
         '''
+        full_path = bp_path / 'animations' / self.path
         # Get the existing file data or use the default
         full_file_content = try_load_json_resource(
-            self.path, 'animation')
+            full_path, 'animation')
         if full_file_content is None:
             full_file_content = {
                 "format_version": "1.18.0", "animations": {}}
@@ -131,7 +132,6 @@ class BpaWriter:
         full_file_content['animations'][full_identifier] = self.data
 
         # Save the data
-        full_path = bp_path / 'animations' / self.path
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with full_path.open('w', encoding='utf8') as f:
             json.dump(full_file_content, f, indent='\t', ensure_ascii=False)
@@ -150,11 +150,11 @@ class LangFileWriter:
     def write(self, rp_path: Path) -> None:
         '''Appends the translations to the lang file or creates a new one.'''
         data = []
-        if self.path.exists():
-            with open(self.path, 'r', encoding='utf8') as f:
+        full_path = rp_path / 'texts' /self.path
+        if full_path.exists():
+            with full_path.open('r', encoding='utf8') as f:
                 data.append(f.read())
         data.extend(self.data)
-        full_path = rp_path / 'texts' /self.path
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with full_path.open('w', encoding='utf8') as f:
             f.write('\n'.join(data))
@@ -454,10 +454,10 @@ class BpeGenerator:
         scripts_animate = description["scripts"]["animate"]
         for anim in bpa_generator.writers:
             # Add to the list of available animations
-            animations[anim.short_id] = BpacWriter.get_full_name(anim.short_id)
+            animations[anim.short_id] = BpaWriter.get_full_name(anim.short_id)
         for i, ac in enumerate(bpac_generator.writers):
             # Add to the list of available animations
-            animations[f"{ac.short_id}_controller"] = BpaWriter.get_full_name(
+            animations[f"{ac.short_id}_controller"] = BpacWriter.get_full_name(
                 ac.short_id)
             # Add to the list of conditionally played animations
             scripts_animate.append({f"{ac.short_id}_controller": f"q.variant == {i}"})

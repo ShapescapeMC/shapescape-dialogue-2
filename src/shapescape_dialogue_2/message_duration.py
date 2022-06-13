@@ -32,5 +32,5 @@ def sound_duration(path: Path) -> Optional[float]:
     except mutagen.MutagenError:
         return None
     if mutFile is not None and type(mutFile) is mutagen.oggvorbis.OggVorbis:
-        return mutFile.info.length
+        return mutFile.info.length  # type: ignore
     return None

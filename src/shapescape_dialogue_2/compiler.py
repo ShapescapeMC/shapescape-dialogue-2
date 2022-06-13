@@ -15,6 +15,8 @@ from typing import Iterable, Literal, Optional, Union
 import numpy as np
 import scipy.interpolate
 
+from itertools import count
+
 from .message_duration import cpm_duration, sound_duration, wpm_duration
 from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesFacingEntity, CoordinatesNode,
@@ -342,7 +344,7 @@ class AnimationTimeline:
     def from_message_node_list(
             settings: ConfigProvider,
             timeline_nodes: list[MessageNode],
-            rp_path: Path) -> AnimationTimeline:
+            rp_path: Path, run_once_counter: count[int]) -> AnimationTimeline:
         '''
         Creates a AnimationTimeline from a list of MessageNodes.
         '''
@@ -406,6 +408,18 @@ class AnimationTimeline:
                     for text_node in node.on_exit_node.command_nodes
                 ]
                 add_event_action(time + duration, *on_exit_actions)
+            if node.run_once_node is not None:
+                run_once_id = f"run_once{next(run_once_counter)}"
+                run_once_actions = [
+                    TimelineEventAction(
+                        'command',
+                        f'execute @s[tag={run_once_id}] ~ ~ ~ {text_node.text}'
+                    )
+                    for text_node in node.run_once_node.command_nodes
+                ]
+                run_once_actions.append(TimelineEventAction(
+                    'command', f"tag @s add {run_once_id}"))
+                add_event_action(time, *run_once_actions)
             for schedule_node in node.schedule_nodes:
                 schedule_time = seconds_to_ticks(  # Should be safe (parser checks that)
                     ConfigProvider.parse_settings(
@@ -592,6 +606,7 @@ class AnimationControllerTimeline:
             timeline: list[Union[MessageNode, DialogueNode, CameraNode]],
             config_provider: ConfigProvider,
             rp_path: Path) -> AnimationControllerTimeline:
+        run_once_counter = count()
         events: list[tuple[AnimationTimeline, ...]] = []
         timeline_deque = deque(timeline)
         while len(timeline_deque) > 0:
@@ -605,7 +620,7 @@ class AnimationControllerTimeline:
                     node = timeline_deque[0]
                     timeline_deque.popleft()
                 animation_timeline = AnimationTimeline.from_message_node_list(
-                    config_provider, message_nodes, rp_path)
+                    config_provider, message_nodes, rp_path, run_once_counter)
                 events.append((animation_timeline,))
             elif isinstance(node, DialogueNode):
                 raise NotImplementedError()
@@ -623,7 +638,8 @@ class AnimationControllerTimeline:
                             f"Line: {node.token.line_number}")
                     messages_timeline = (
                         AnimationTimeline.from_message_node_list(
-                            config_provider, node.time.messages, rp_path)
+                            config_provider, node.time.messages, rp_path,
+                            run_once_counter)
                     )
                     time = messages_timeline.time
                 else:

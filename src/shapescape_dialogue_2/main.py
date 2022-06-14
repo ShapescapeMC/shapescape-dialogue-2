@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from .compiler import CompileError
 from .generator import Context, GeneratorError, generate
@@ -133,6 +133,11 @@ def main_commandline() -> None:
         action='store_true',
         help='Skip outputting the packs.'
     )
+    parser.add_argument(
+        '--debug-print-stack-traces',
+        action='store_true',
+        help='Print stack traces of the errors.'
+    )
     args = parser.parse_args()
     if not args.debug_skip_packs_output:
         if args.bp_path is None or args.rp_path is None:
@@ -141,16 +146,22 @@ def main_commandline() -> None:
                 "then the --bp-path and --rp-path flags must be specified.",
                 file=sys.stderr)
             sys.exit(1)
-    try:
-        main(
-            source_file=args.source_file,
-            bp_path=args.bp_path,
-            rp_path=args.rp_path,
-            namespace=args.namespace,
-            debug_log_tokens=args.debug_log_tokens,
-            debug_log_ast=args.debug_log_ast,
-            debug_skip_packs_output=args.debug_skip_packs_output
-        )
-    except (ParseError, CompileError, GeneratorError) as e:
-        print(f"ERROR: {e}", file=sys.stderr)
-        exit(1)
+    
+    run: Callable[[], None] = lambda: main(
+        source_file=args.source_file,
+        bp_path=args.bp_path,
+        rp_path=args.rp_path,
+        namespace=args.namespace,
+        debug_log_tokens=args.debug_log_tokens,
+        debug_log_ast=args.debug_log_ast,
+        debug_skip_packs_output=args.debug_skip_packs_output
+    )
+
+    if args.debug_print_stack_traces:
+        run()
+    else:
+        try:
+            run()
+        except (ParseError, CompileError, GeneratorError) as e:
+            print(f"ERROR: {e}", file=sys.stderr)
+            exit(1)

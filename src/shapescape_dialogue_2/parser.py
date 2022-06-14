@@ -47,7 +47,7 @@ class TokenType(Enum):
 
     # Labels
     SETTINGS = auto()
-    SOUND_PROFILES = auto()
+    PROFILES = auto()
     TIME = auto()
     BLANK = auto()
     SCHEDULE = auto()
@@ -63,6 +63,8 @@ class TokenType(Enum):
     RUN_ONCE = auto()
     ON_EXIT = auto()
     NAMED_LABEL = auto()  # any kind of label with custom name
+    SOUNDS=auto()
+    VARIABLES=auto()
 
     # Other (more complex) tokens
     SETTING = auto()
@@ -240,13 +242,58 @@ class Indent(NamedTuple):
 var_pattern = r'[a-zA-Z_]+[a-zA-Z_0-9]*'
 float_pattern = r'[+-]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+)'
 
+# variable values quoted or not quoted strings using " or '
+quoted_or_not_pattern = r'''"([^\\"]|\\")*"|'([^\\']|\\')*'|\S+'''
+
+def dequote(matched_string: str) -> str:
+    '''
+    Takes a string that matched 'quoted_or_not_pattern' and returns the
+    value of the string with the escape characters removed.
+    '''
+    if matched_string.startswith('"'):
+        q = '"'
+    elif matched_string.startswith("'"):
+        q = "'"
+    else:
+        return matched_string
+    escaped = False
+    escape_map = {
+        "\\": "\\",
+        q: q
+    }
+    result: list[str] = []
+    for i, c in enumerate(matched_string):
+        if i == 0:
+            continue  # Skip first character
+        if escaped:
+            if c not in escape_map:
+                raise ParseError(
+                    f"Invalid character after escape character in string:\n"
+                    f"{matched_string}\n"+
+                    i*" "+"^\n"  # Point at that character
+                )
+            result.append(escape_map[c])
+            escaped = False
+        elif c == "\\":
+            escaped = True
+        else:
+            result.append(c)
+    if result[-1] != q:  # Last character must close the quotes
+        raise ParseError(
+            f"Quoted string not closed. Missing {q} at the end:\n"
+            f"{matched_string}\n" +
+            i*" "+"^\n"  # Point at the last character
+        )
+    return "".join(result[:-1])
+
+
 TOKENIZER = re.Scanner([  # type: ignore
     # Ignore blank lines and comments
     (r'\s+', lambda s, t: None),
     (r'##.+', lambda s, t: None),
 
     (r'settings:', lambda s, t: (TokenType.SETTINGS, t)),
-    (r'sound_profiles:', lambda s, t: (TokenType.SOUND_PROFILES, t)),
+    (r'profiles:', lambda s, t: (TokenType.PROFILES, t)),
     (r'time:', lambda s, t: (TokenType.TIME, t)),
     (r'blank:', lambda s, t: (TokenType.BLANK, t)),
     (r'schedule:', lambda s, t: (TokenType.SCHEDULE, t)),
@@ -261,9 +308,11 @@ TOKENIZER = re.Scanner([  # type: ignore
     (r'dialogue:', lambda s, t: (TokenType.DIALOGUE, t)),
     (r'dialogue_option:', lambda s, t: (TokenType.DIALOGUE_OPTION, t)),
     (r'dialogue_exit:', lambda s, t: (TokenType.DIALOGUE_EXIT, t)),
+    (r'sounds:', lambda s, t: (TokenType.SOUNDS, t)),
+    (r'variables:', lambda s, t: (TokenType.VARIABLES, t)),
     (
-        r'('+var_pattern+')=(\S+)',
-        lambda s, t: (TokenType.SETTING, Setting(s.match[1], s.match[2]))
+        r'('+var_pattern+')=('+quoted_or_not_pattern+')',
+        lambda s, t: (TokenType.SETTING, Setting(s.match[1], dequote(s.match[2])))
     ),
     (
         f'({float_pattern}) ({float_pattern}) ({float_pattern}) facing'
@@ -358,7 +407,7 @@ def tokenize(source: list[str]) -> list[Token]:
 class RootAstNode:
     timeline: list[Union[MessageNode, DialogueNode, CameraNode]]
     settings: Optional[SettingsNode] = None
-    sound_profiles: Optional[SoundProfilesNode] = None
+    profiles: Optional[ProfilesNode] = None
 
     @staticmethod
     def from_token_stack(tokens: deque[Token]) -> RootAstNode:
@@ -370,8 +419,8 @@ class RootAstNode:
             token = tokens[0]
         # Sound profiles
         sound_profiles = None
-        if token.token_type is TokenType.SOUND_PROFILES:
-            sound_profiles = SoundProfilesNode.from_token_stack(tokens)
+        if token.token_type is TokenType.PROFILES:
+            sound_profiles = ProfilesNode.from_token_stack(tokens)
             token = tokens[0]
         # Timeline
         timeline: list[Union[MessageNode, DialogueNode, CameraNode]] = []
@@ -505,27 +554,27 @@ class SettingNode:
         return SettingNode(name, value, root_token)
 
 @dataclass
-class SoundProfilesNode:
-    sound_profiles: list[SoundProfileNode]
+class ProfilesNode:
+    profiles: list[ProfileNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: deque[Token]) -> SoundProfilesNode:
+    def from_token_stack(tokens: deque[Token]) -> ProfilesNode:
         token = tokens.popleft()
         root_token = token
-        if token.token_type is not TokenType.SOUND_PROFILES:
+        if token.token_type is not TokenType.PROFILES:
             raise ParseError.from_unexpected_token(
-                token, TokenType.SOUND_PROFILES)
+                token, TokenType.PROFILES)
         # Expect indentation or finish parsing message node
         token = tokens[0]
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         else:
-            return SoundProfilesNode([], root_token)
-        sound_profiles: list[SoundProfileNode] = []
+            return ProfilesNode([], root_token)
+        sound_profiles: list[ProfileNode] = []
         while token.token_type == TokenType.NAMED_LABEL:
-            sound_profiles.append(SoundProfileNode.from_token_stack(tokens))
+            sound_profiles.append(ProfileNode.from_token_stack(tokens))
             token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
@@ -533,16 +582,17 @@ class SoundProfilesNode:
         elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return SoundProfilesNode(sound_profiles, root_token)
+        return ProfilesNode(sound_profiles, root_token)
 
 @dataclass
-class SoundProfileNode:
+class ProfileNode:
     name: str
-    sound_profile_variants: list[SoundProfileVariant]
+    sounds: Optional[SoundsNode]
+    variables: Optional[VariablesNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: deque[Token]) -> SoundProfileNode:
+    def from_token_stack(tokens: deque[Token]) -> ProfileNode:
         token = tokens.popleft()
         root_token = token
 
@@ -553,47 +603,81 @@ class SoundProfileNode:
             tokens.popleft()
             token = tokens[0]
         else:
-            return SoundProfileNode(name, [], root_token)
-        sound_profile_variant: list[SoundProfileVariant] = []
-        while token.token_type == TokenType.NAMED_LABEL:
-            sound_profile_variant.append(
-                SoundProfileVariant.from_token_stack(tokens))
-            token = tokens[0]
+            return ProfileNode(name, None, None, root_token)
+        sounds: Optional[SoundsNode] = None
+        variables: Optional[VariablesNode] = None
+        while token.token_type in [TokenType.SOUNDS, TokenType.VARIABLES]:
+            if token.token_type is TokenType.SOUNDS:
+                if sounds is not None:
+                    raise ParseError(
+                        f"Duplicate 'sounds' sections in profile '{name}' "
+                        f"at line {token.line_number}")
+                sounds = SoundsNode.from_token_stack(tokens)
+                token = tokens[0]
+            elif token.token_type is TokenType.VARIABLES:
+                if variables is not None:
+                    raise ParseError(
+                        f"Duplicate 'variables' sections in profile '{name}' "
+                        f"at line {token.line_number}")
+                variables = VariablesNode.from_token_stack(tokens)
+                token = tokens[0]
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
         elif token.token_type is not TokenType.EOF:  # not DEDENT and not EOF
             raise ParseError.from_unexpected_token(
                 token, TokenType.DEDENT, TokenType.EOF)
-        return SoundProfileNode(name, sound_profile_variant, root_token)
+        return ProfileNode(name, sounds, variables, root_token)
 
-    def as_dictionary(self) -> dict[str, str]:
-        '''
-        Returns the dictionary representation of this sound profile.
-        '''
-        result: dict[str, str] = {}
-        for spv in self.sound_profile_variants:
-            settings = SettingsNode.settings_list_to_dict(spv.settings)
-            sound = settings['sound']  # No KeyError check here, should be safe
-            result[spv.name] = sound
-        return result
+    # def as_dictionary(self) -> dict[str, str]:
+    #     '''
+    #     Returns the dictionary representation of this sound profile.
+    #     '''
+    #     result: dict[str, str] = {}
+    #     for spv in self.sound_profile_variants:
+    #         settings = SettingsNode.settings_list_to_dict(spv.settings)
+    #         sound = settings['sound']  # No KeyError check here, should be safe
+    #         result[spv.name] = sound
+    #     return result
 
 @dataclass
-class SoundProfileVariant:
-    name: str
+class SoundsNode:
     settings: SettingsList
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: deque[Token]) -> SoundProfileVariant:
+    def from_token_stack(tokens: deque[Token]) -> SoundsNode:
         token = tokens.popleft()
         root_token = token
-        name = token.get_str_from_named_label_token()
-        settings = SettingsNode.parse_settings(
-            tokens,
-            accepted_settings={"sound": str},
-            expected_settings={"sound": str})
-        return SoundProfileVariant(name, settings, root_token)
+        if token.token_type is not TokenType.SOUNDS:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SOUNDS)
+        token = tokens[0]
+        if token.token_type is not TokenType.SETTING:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SETTING)
+        settings = SettingsNode.parse_settings(tokens)
+        return SoundsNode(settings, root_token)
+
+
+@dataclass
+class VariablesNode:
+    settings: SettingsList
+    token: Token
+    
+    @staticmethod
+    def from_token_stack(tokens: deque[Token]) -> VariablesNode:
+        token = tokens.popleft()
+        root_token = token
+        if token.token_type is not TokenType.VARIABLES:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.VARIABLES)
+        token = tokens[0]
+        if token.token_type is not TokenType.SETTING:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SETTING)
+        settings = SettingsNode.parse_settings(tokens)
+        return VariablesNode(settings, root_token)
 
 @dataclass
 class MessageNode:

@@ -1,11 +1,17 @@
 settings: wpm=120 title_max=15
-sound_profiles:
+profiles:
     male:
-        obi_wan: sound=starwars/obi_wan/male
-        grevious: sound=starwars/grevious/male
+        sounds:
+        obi_wan=starwars/obi_wan/male
+        grevious=starwars/grevious/male
+        variables:
+        obi_wan_title="Mr."
     female:
-        obi_wan: sound=starwars/obi_wan/female
-        grevious: sound=starwars/grevious/apache_helicopter
+        sounds:
+        obi_wan=starwars/obi_wan/female
+        grevious=starwars/grevious/apache_helicopter
+        variables:
+        obi_wan_title="Mrs."
 
 camera:
     10 10 10 90 0
@@ -24,7 +30,7 @@ camera:
         tell: sound=obi_wan:hello.ogg
             >[Obi-Wan] Hello there!
         tell: wpm=90 sound=grevious:general_kenobi.ogg
-            >[Grevious] General Kenobi!
+            >[Grevious] {obi_wan_title} General Kenobi!
             >[this is just an example...] This is a multiline text.
             loop: time=0.1
                 /playsound grevious.cough

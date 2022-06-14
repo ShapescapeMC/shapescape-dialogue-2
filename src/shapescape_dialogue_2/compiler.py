@@ -4,7 +4,7 @@ and do some additiona validation. It doesn't generate any code, but it changes
 the AST to a format that is used for the code generation.
 '''
 from __future__ import annotations
-
+import re
 import math
 import sys
 from collections import defaultdict, deque
@@ -21,8 +21,8 @@ from .message_duration import cpm_duration, sound_duration, wpm_duration
 from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesFacingEntity, CoordinatesNode,
                      CoordinatesRotated, DialogueNode, MessageNode,
-                     SettingsList, SettingsNode, SoundProfileNode)
-
+                     SettingsList, SettingsNode, ProfileNode, var_pattern,
+                     Token)
 
 class CompileError(Exception):
     '''
@@ -125,13 +125,55 @@ class ConfigProvider:
     '''
     def __init__(
             self, settings: Optional[SettingsNode],
-            sound_profile: Optional[SoundProfileNode]=None):
+            profile: Optional[ProfileNode]=None):
         self.settings = (
             {} if settings is None else
             ConfigProvider.parse_settings(settings.settings))
-        self.sound_profile: Optional[dict[str, Path]] = (
-            None if sound_profile is None else
-            ConfigProvider.parse_sound_profile(sound_profile))
+        self.sounds: dict[str, str] = {}
+        self.variables: dict[str, str] = {}
+        if profile is not None:
+            if profile.sounds is not None:
+                self.sounds = ConfigProvider.parse_settings(
+                    profile.sounds.settings)
+            if profile.variables is not None:
+                self.variables = ConfigProvider.parse_settings(
+                    profile.variables.settings)
+
+    def insert_variables(self, text: str, line_number: Optional[int]) -> str:
+        '''
+        Inserts the variables into text and returns modified text.
+
+        :param text: The string to be modified
+        :param line_number: The line number for error messages
+        '''
+        cursor: int = 0
+        replace = []
+        insertion_pattern = re.compile(r"\{("+var_pattern+")\}")
+        while (
+                cursor < len(text) and
+                (match := insertion_pattern.search(text[cursor:]))):
+            start, end = cursor+match.start(), cursor+match.end()
+            try:
+                replace.append((start, end, self.variables[match[1]])) 
+            except KeyError as e:
+                raise CompileError(
+                    f"Reference to undefined variable \"{e}\"" +
+                    # In practice this the line number should always be
+                    # available.
+                    f"on line {line_number}"
+                    if line_number is not None else "")
+            cursor = end
+        if len(replace) > 0:
+            result_list = []
+            prev_end = 0
+            for r in replace:
+                result_list.append(text[prev_end:r[0]])  # prefix
+                result_list.append(r[2])  # value
+                prev_end = r[1]
+            # Last item (python's variable scope is weeeird :O, but awesome)
+            result_list.append(text[r[1]:])  # sufix
+            return "".join(result_list)
+        return text
 
     @staticmethod
     def parse_settings(settings: SettingsList) -> dict[str, str]:
@@ -147,29 +189,6 @@ class ConfigProvider:
                     f'{setting.token.line_number}')
             settings_dict[setting.name] = setting.value
         return settings_dict
-
-    @staticmethod
-    def parse_sound_profile(
-            sound_profile: SoundProfileNode) -> dict[str, Path]:
-        '''
-        Returns a dictionary with available mappings of the sound profile
-        to file paths.
-        '''
-        sound_profile_dict: dict[str, Path] = {}
-        for variant in sound_profile.sound_profile_variants:
-            variant_settings = variant.settings
-            if variant.name in sound_profile_dict:
-                raise CompileError(
-                    f'Duplicate sound profile entry '
-                    f'{variant.name} at line '
-                    f'{variant.token.line_number}')
-            settings = ConfigProvider.parse_settings(variant_settings)
-            if 'sound' not in settings:
-                raise CompileError(
-                    f'Missing sound setting on line '
-                    f'{variant.token.line_number}')
-            sound_profile_dict[variant.name] = Path(settings['sound'])
-        return sound_profile_dict
 
     def message_node_duration(
             self, message_node: MessageNode, rp_path: Path) -> int:
@@ -245,7 +264,9 @@ class ConfigProvider:
         if 'sound' in node_settings:
             sound_path = self.resolve_sound_path(
                 node_settings['sound'], message_node)
-            return TimelineEventAction('playsound', sound_path.as_posix())
+            return TimelineEventAction(
+                'playsound', sound_path.as_posix(),
+                message_node.token.line_number)
         return None
 
     def resolve_sound_path(
@@ -256,21 +277,20 @@ class ConfigProvider:
         messages.
         '''
         sound_path: Path
-        if (
-                self.sound_profile is not None and
-                ":" in sound):
+        if ":" in sound:
             sound_variant, sound_name = sound.split(':')
-            if sound_variant not in self.sound_profile:
+            if sound_variant not in self.sounds:
                 raise CompileError(
                     f"Trying to use undefined sound variant "
                     f"'{sound_variant}' of the sound '{sound_name}' on "
                     f"line {message_node.token.line_number}.\n"
                     f"Available variants: "
-                    f"{', '.join(self.sound_profile.keys())}")
-            sound_path = self.sound_profile[sound_variant] / sound_name
+                    f"{', '.join(self.sounds.keys())}")
+            sound_path = Path(self.sounds[sound_variant]) / sound_name
         else:
             sound_path = Path(sound)
         return Path("sounds") / sound_path
+
 
 @dataclass
 class TimelineEventAction:
@@ -282,29 +302,42 @@ class TimelineEventAction:
     action_type: Literal["tell", "title", "actionbar", "command", "subtitle", "playsound"]
     value: str
 
+    # Line number for error messages (sometimes doesn't apply because) some
+    # actions are not created based on a specific line.
+    line_number: Optional[int]
+
     def to_command(
             self, tc_provider: TranslationCodeProvider,
-            sc_provider: SoundCodeProvider) -> str:
+            sc_provider: SoundCodeProvider,
+            config_provider: ConfigProvider) -> str:
         '''
         Returns the command to be executed in Minecraft sequence.
         '''
         if self.action_type == "tell":
-            translation_code = tc_provider.get_translation_code(self.value)
+            resolved_value = config_provider.insert_variables(
+                self.value, self.line_number)
+            translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'tellraw @a '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "title":
-            translation_code = tc_provider.get_translation_code(self.value)
+            resolved_value = config_provider.insert_variables(
+                self.value, self.line_number)
+            translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a title '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "actionbar":
-            translation_code = tc_provider.get_translation_code(self.value)
+            resolved_value = config_provider.insert_variables(
+                self.value, self.line_number)
+            translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a actionbar '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
         elif self.action_type == "subtitle":
-            translation_code = tc_provider.get_translation_code(self.value)
+            resolved_value = config_provider.insert_variables(
+                self.value, self.line_number)
+            translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a subtitle '
                 f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
@@ -350,7 +383,8 @@ class AnimationTimeline:
         '''
         events: dict[int, TimelineEvent] = {}
 
-        def add_event_action(time: int, *actions: TimelineEventAction) -> None:
+        def add_event_action(
+                time: int, *actions: TimelineEventAction) -> None:
             if time not in events:
                 events[time] = TimelineEvent(actions=[])
             events[time].actions.extend(actions)
@@ -367,7 +401,8 @@ class AnimationTimeline:
             actions: list[TimelineEventAction]
             if node.node_type == 'tell':
                 actions = [  # The messages
-                    TimelineEventAction('tell', text_node.text)
+                    TimelineEventAction(
+                        'tell', text_node.text, text_node.token.line_number)
                     for text_node in node.text_nodes
                 ]
             elif node.node_type == 'blank':
@@ -375,12 +410,18 @@ class AnimationTimeline:
             elif node.node_type == 'title':
                 if len(node.text_nodes) == 1:
                     actions = [  # The title
-                        TimelineEventAction('title', node.text_nodes[0].text)
+                        TimelineEventAction(
+                            'title', node.text_nodes[0].text, 
+                            node.text_nodes[0].token.line_number)
                     ]
                 elif len(node.text_nodes) == 2:
                     actions = [  # The title and subtitle
-                        TimelineEventAction('title', node.text_nodes[0].text),
-                        TimelineEventAction('subtitle', node.text_nodes[1].text)
+                        TimelineEventAction(
+                            'title', node.text_nodes[0].text,
+                            node.text_nodes[0].token.line_number),
+                        TimelineEventAction(
+                            'subtitle', node.text_nodes[1].text,
+                            node.text_nodes[1].token.line_number)
                     ]
                 else:
                     raise CompileError(
@@ -393,18 +434,24 @@ class AnimationTimeline:
                         "Actionbar node should have exactly one text "
                         f"node {node.token.line_number}")
                 actions = [  # The messages
-                    TimelineEventAction('actionbar', text_node.text)
+                    TimelineEventAction(
+                        'actionbar', text_node.text,
+                        text_node.token.line_number)
                     for text_node in node.text_nodes
                 ]
             else:
                 raise ValueError("Unknown MessageNode type")
             actions += [
-                TimelineEventAction('command', text_node.text)
+                TimelineEventAction(
+                        'command', text_node.text,
+                        text_node.token.line_number)
                 for text_node in node.command_nodes
             ]
             if node.on_exit_node is not None:
                 on_exit_actions = [
-                    TimelineEventAction('command', text_node.text)
+                    TimelineEventAction(
+                        'command', text_node.text,
+                        text_node.token.line_number)
                     for text_node in node.on_exit_node.command_nodes
                 ]
                 add_event_action(time + duration, *on_exit_actions)
@@ -413,19 +460,22 @@ class AnimationTimeline:
                 run_once_actions = [
                     TimelineEventAction(
                         'command',
-                        f'execute @s[tag=!{run_once_id}] ~ ~ ~ {text_node.text}'
-                    )
+                        f'execute @s[tag=!{run_once_id}] ~ ~ ~ '
+                            f'{text_node.text}',
+                        text_node.token.line_number)
                     for text_node in node.run_once_node.command_nodes
                 ]
                 run_once_actions.append(TimelineEventAction(
-                    'command', f"tag @s add {run_once_id}"))
+                    'command', f"tag @s add {run_once_id}", None))
                 add_event_action(time, *run_once_actions)
             for schedule_node in node.schedule_nodes:
                 schedule_time = seconds_to_ticks(  # Should be safe (parser checks that)
                     ConfigProvider.parse_settings(
                         schedule_node.settings)['time'])
                 scheduled_actions = [
-                    TimelineEventAction('command', text_node.text)
+                    TimelineEventAction(
+                        'command', text_node.text,
+                        text_node.token.line_number)
                     for text_node in schedule_node.command_nodes
                 ]
                 add_event_action(time + schedule_time, *scheduled_actions)
@@ -436,7 +486,9 @@ class AnimationTimeline:
                 if loop_time <= 0:
                     loop_time = 1  # TODO - should I log a warning?
                 looping_actions = [
-                    TimelineEventAction('command', text_node.text)
+                    TimelineEventAction(
+                        'command', text_node.text,
+                        text_node.token.line_number)
                     for text_node in loop_node.command_nodes
                 ]
                 loop_time_sum = 0
@@ -500,7 +552,7 @@ class AnimationTimeline:
                 events[frame] = TimelineEvent([])
             output_value = f"tp @a {x:.2f} {y:.2f} {z:.2f} {rotation_suffixes[frame]}"
             events[frame].actions.append(
-                TimelineEventAction("command", output_value))
+                TimelineEventAction("command", output_value, None))
         return AnimationTimeline(events, time)
 
     @staticmethod

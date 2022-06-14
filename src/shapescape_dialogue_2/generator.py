@@ -13,7 +13,7 @@ from typing import Any, Optional, Union
 from .compiler import (AnimationControllerTimeline, AnimationTimeline,
                        ConfigProvider, SoundCodeProvider, TimelineEvent,
                        TranslationCodeProvider)
-from .parser import RootAstNode, SoundProfileNode
+from .parser import ProfileNode, RootAstNode
 
 
 def ticks_to_seconds(ticks: int) -> float:
@@ -246,7 +246,7 @@ class McfunctionGenerator:
 
     def add_writer(
             self, function_id: str, event: TimelineEvent, 
-            context: Context) -> None:
+            context: Context, config_provider: ConfigProvider) -> None:
         # Check the content, the function needs to have at least 1 command
         len_events = len(event.actions)
         if len_events == 0:
@@ -259,7 +259,8 @@ class McfunctionGenerator:
         for action in event.actions:
             command = action.to_command(
                 context.tc_provider,
-                context.sc_provider)
+                context.sc_provider,
+                config_provider)
             commands.append(command)
 
         # Append the writer
@@ -276,7 +277,8 @@ class BpaGenerator:
     def add_writer(
             self, bpac_state_name: str, state_animation_index: int,
             timeline: AnimationTimeline, context: Context,
-            mcfunction_generator: McfunctionGenerator) -> None:
+            mcfunction_generator: McfunctionGenerator,
+            config_provider: ConfigProvider) -> None:
         '''
         Adds BpaWriter (and its mcfunctions), the name of the animation is
         based on the BPAC state that calls this and an index (if there are
@@ -310,11 +312,13 @@ class BpaGenerator:
             if len(event.actions) == 1:
                 command = event.actions[0].to_command(
                     context.tc_provider,
-                    context.sc_provider)
+                    context.sc_provider,
+                    config_provider)
                 data['timeline'][str(time)] = [f"/{command}"]
             else:
                 mcfunction_generator.add_writer(
-                    full_function_id, event, context)
+                    full_function_id, event, context,
+                    config_provider)
                 data['timeline'][str(time)] = [f"/function {full_function_id}"]
 
         # Append the writer
@@ -332,7 +336,8 @@ class BpacGenerator:
     def add_writer(
             self, sound_profile_name: str, timeline: AnimationControllerTimeline,
             context: Context, bpa_generator: BpaGenerator,
-            mcfunction_generator: McfunctionGenerator) -> None:
+            mcfunction_generator: McfunctionGenerator,
+            config_provider: ConfigProvider) -> None:
         '''
         Adds BpacWriter (and its animations, and mcfunctions), the name of the
         BPAC is based on the sound profile name.
@@ -367,7 +372,7 @@ class BpacGenerator:
                 # Generate animations
                 bpa_generator.add_writer(
                     state_name, j, animation_timeline, context,
-                    mcfunction_generator)
+                    mcfunction_generator, config_provider)
                 # TODO - This is ugly, getting the name of the animation from
                 # the recently added writer
                 animation_names.append(
@@ -518,24 +523,24 @@ def generate(tree: RootAstNode, context: Context) -> None:
     lang_file_writer: Optional[LangFileWriter] = None
 
     def generate_bpac_anim_and_mcfunction(
-            sound_profile_name: str,
-            sound_profile: Optional[SoundProfileNode]) -> None:
+            profile_name: str,
+            profile: Optional[ProfileNode]) -> None:
         # Setup config provider
-        config_provider = ConfigProvider(tree.settings, sound_profile)
+        config_provider = ConfigProvider(tree.settings, profile)
         # Create timeline for BPAC
         ac_timeline = AnimationControllerTimeline.from_timeline_nodes(
             tree.timeline, config_provider, context.rp_path)
         # Generate BPAC, BPA and mcfunction
         bpac_generator.add_writer(
-            sound_profile_name, ac_timeline, context, bpa_generator,
-            mcfunction_generator)
+            profile_name, ac_timeline, context, bpa_generator,
+            mcfunction_generator, config_provider)
 
     # The prefix is the same for all profiles because the text is the same
     context.tc_provider.prefix = f'dialogue.{context.subpath}'
 
     # Generate bpac, anim, mcfunctions
-    if tree.sound_profiles is not None:
-        for sound_profile in tree.sound_profiles.sound_profiles:
+    if tree.profiles is not None:
+        for sound_profile in tree.profiles.profiles:
             generate_bpac_anim_and_mcfunction(
                 sound_profile.name, sound_profile)
     else:

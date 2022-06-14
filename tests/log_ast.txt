@@ -19,7 +19,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                             y_rot=90.0,
                             x_rot=0.0
                         ),
-                        line_number=11
+                        line_number=17
                     )
                 ),
                 shapescape_dialogue_2.parser.CoordinatesNode(
@@ -39,7 +39,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                             y_rot=30.0,
                             x_rot=0.0
                         ),
-                        line_number=12
+                        line_number=18
                     )
                 ),
                 shapescape_dialogue_2.parser.CoordinatesNode(
@@ -59,7 +59,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                             y_rot=0.0,
                             x_rot=0.0
                         ),
-                        line_number=13
+                        line_number=19
                     )
                 ),
                 shapescape_dialogue_2.parser.CoordinatesNode(
@@ -79,14 +79,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                             y_rot=0.0,
                             x_rot=0.0
                         ),
-                        line_number=14
+                        line_number=20
                     )
                 )
             ],
             token=shapescape_dialogue_2.parser.Token(
                 token_type=shapescape_dialogue_2.parser.TokenType.CAMERA,
                 value='camera:',
-                line_number=10
+                line_number=16
             ),
             time=shapescape_dialogue_2.parser.TimeNode(
                 settings=[],
@@ -100,7 +100,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
                                     value='scorebard players set @a force 0',
-                                    line_number=17
+                                    line_number=23
                                 )
                             )
                         ],
@@ -115,7 +115,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                             value='execute '
                                                 '@a[type=shapescape:clone] ~ ~ ~  '
                                                 'function order_66',
-                                            line_number=21
+                                            line_number=27
                                         )
                                     )
                                 ],
@@ -129,14 +129,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                                                 name='time',
                                                 value='2.3'
                                             ),
-                                            line_number=20
+                                            line_number=26
                                         )
                                     )
                                 ],
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.SCHEDULE,
                                     value='schedule:',
-                                    line_number=20
+                                    line_number=26
                                 )
                             )
                         ],
@@ -150,7 +150,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='time',
                                         value='1'
                                     ),
-                                    line_number=16
+                                    line_number=22
                                 )
                             )
                         ],
@@ -158,7 +158,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
                             value='blank:',
-                            line_number=16
+                            line_number=22
                         ),
                         run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
                             command_nodes=[
@@ -167,14 +167,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                                     token=shapescape_dialogue_2.parser.Token(
                                         token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
                                         value='summon shapescape:obi_wan 1 2 3',
-                                        line_number=19
+                                        line_number=25
                                     )
                                 )
                             ],
                             token=shapescape_dialogue_2.parser.Token(
                                 token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
                                 value='run_once:',
-                                line_number=18
+                                line_number=24
                             )
                         ),
                         on_exit_node=shapescape_dialogue_2.parser.OnExitNode(
@@ -187,14 +187,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         value='event entity '
                                             '@e[type=shapescape:obi_wan] '
                                             'remove_high_ground',
-                                        line_number=23
+                                        line_number=29
                                     )
                                 )
                             ],
                             token=shapescape_dialogue_2.parser.Token(
                                 token_type=shapescape_dialogue_2.parser.TokenType.ON_EXIT,
                                 value='on_exit:',
-                                line_number=22
+                                line_number=28
                             )
                         )
                     ),
@@ -206,7 +206,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
                                     value='[Obi-Wan] Hello there!',
-                                    line_number=25
+                                    line_number=31
                                 )
                             )
                         ],
@@ -222,7 +222,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='sound',
                                         value='obi_wan:hello.ogg'
                                     ),
-                                    line_number=24
+                                    line_number=30
                                 )
                             )
                         ],
@@ -230,18 +230,19 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.TELL,
                             value='tell:',
-                            line_number=24
+                            line_number=30
                         )
                     ),
                     shapescape_dialogue_2.parser.MessageNode(
                         node_type='tell',
                         text_nodes=[
                             shapescape_dialogue_2.parser.TextNode(
-                                text='[Grevious] General Kenobi!',
+                                text='[Grevious] {obi_wan_title} General Kenobi!',
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
-                                    value='[Grevious] General Kenobi!',
-                                    line_number=27
+                                    value='[Grevious] {obi_wan_title} General '
+                                        'Kenobi!',
+                                    line_number=33
                                 )
                             ),
                             shapescape_dialogue_2.parser.TextNode(
@@ -251,7 +252,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
                                     value='[this is just an example...] This is a '
                                         'multiline text.',
-                                    line_number=28
+                                    line_number=34
                                 )
                             )
                         ],
@@ -267,7 +268,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='wpm',
                                         value='90'
                                     ),
-                                    line_number=26
+                                    line_number=32
                                 )
                             ),
                             shapescape_dialogue_2.parser.SettingNode(
@@ -279,7 +280,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='sound',
                                         value='grevious:general_kenobi.ogg'
                                     ),
-                                    line_number=26
+                                    line_number=32
                                 )
                             )
                         ],
@@ -291,7 +292,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         token=shapescape_dialogue_2.parser.Token(
                                             token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
                                             value='playsound grevious.cough',
-                                            line_number=30
+                                            line_number=36
                                         )
                                     )
                                 ],
@@ -305,21 +306,21 @@ shapescape_dialogue_2.parser.RootAstNode(
                                                 name='time',
                                                 value='0.1'
                                             ),
-                                            line_number=29
+                                            line_number=35
                                         )
                                     )
                                 ],
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.LOOP,
                                     value='loop:',
-                                    line_number=29
+                                    line_number=35
                                 )
                             )
                         ],
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.TELL,
                             value='tell:',
-                            line_number=26
+                            line_number=32
                         )
                     ),
                     shapescape_dialogue_2.parser.MessageNode(
@@ -330,7 +331,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
                                     value='Bossfight!',
-                                    line_number=32
+                                    line_number=38
                                 )
                             ),
                             shapescape_dialogue_2.parser.TextNode(
@@ -338,7 +339,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
                                     value='This is a subtitle.',
-                                    line_number=33
+                                    line_number=39
                                 )
                             )
                         ],
@@ -348,7 +349,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
                                     value='scoreboard players set @a force 100',
-                                    line_number=34
+                                    line_number=40
                                 )
                             )
                         ],
@@ -358,7 +359,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.TITLE,
                             value='title:',
-                            line_number=31
+                            line_number=37
                         ),
                         run_once_node=shapescape_dialogue_2.parser.RunOnceNode(
                             command_nodes=[
@@ -367,14 +368,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                                     token=shapescape_dialogue_2.parser.Token(
                                         token_type=shapescape_dialogue_2.parser.TokenType.COMMAND,
                                         value='music play bossfight',
-                                        line_number=36
+                                        line_number=42
                                     )
                                 )
                             ],
                             token=shapescape_dialogue_2.parser.Token(
                                 token_type=shapescape_dialogue_2.parser.TokenType.RUN_ONCE,
                                 value='run_once:',
-                                line_number=35
+                                line_number=41
                             )
                         )
                     ),
@@ -386,7 +387,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                 token=shapescape_dialogue_2.parser.Token(
                                     token_type=shapescape_dialogue_2.parser.TokenType.TEXT,
                                     value='Objective: kill General Grevious',
-                                    line_number=38
+                                    line_number=44
                                 )
                             )
                         ],
@@ -397,7 +398,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.ACTIONBAR,
                             value='actionbar:',
-                            line_number=37
+                            line_number=43
                         )
                     ),
                     shapescape_dialogue_2.parser.MessageNode(
@@ -562,7 +563,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         "text. More text. More text. More text. "
                                         "More text. More text. More text. More "
                                         "text. More text. More text.",
-                                    line_number=40
+                                    line_number=46
                                 )
                             )
                         ],
@@ -573,7 +574,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.TELL,
                             value='tell:',
-                            line_number=39
+                            line_number=45
                         )
                     ),
                     shapescape_dialogue_2.parser.MessageNode(
@@ -591,7 +592,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='sound',
                                         value='starwars/rd2d/beep_boop.ogg'
                                     ),
-                                    line_number=41
+                                    line_number=47
                                 )
                             ),
                             shapescape_dialogue_2.parser.SettingNode(
@@ -603,7 +604,7 @@ shapescape_dialogue_2.parser.RootAstNode(
                                         name='time',
                                         value='1'
                                     ),
-                                    line_number=41
+                                    line_number=47
                                 )
                             )
                         ],
@@ -611,14 +612,14 @@ shapescape_dialogue_2.parser.RootAstNode(
                         token=shapescape_dialogue_2.parser.Token(
                             token_type=shapescape_dialogue_2.parser.TokenType.BLANK,
                             value='blank:',
-                            line_number=41
+                            line_number=47
                         )
                     )
                 ],
                 token=shapescape_dialogue_2.parser.Token(
                     token_type=shapescape_dialogue_2.parser.TokenType.TIME,
                     value='time:',
-                    line_number=15
+                    line_number=21
                 )
             )
         )
@@ -656,120 +657,136 @@ shapescape_dialogue_2.parser.RootAstNode(
             line_number=1
         )
     ),
-    sound_profiles=shapescape_dialogue_2.parser.SoundProfilesNode(
-        sound_profiles=[
-            shapescape_dialogue_2.parser.SoundProfileNode(
+    profiles=shapescape_dialogue_2.parser.ProfilesNode(
+        profiles=[
+            shapescape_dialogue_2.parser.ProfileNode(
                 name='male',
-                sound_profile_variants=[
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='obi_wan',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/obi_wan/male',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/obi_wan/male'
-                                    ),
-                                    line_number=4
-                                )
+                sounds=shapescape_dialogue_2.parser.SoundsNode(
+                    settings=[
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='obi_wan',
+                            value='starwars/obi_wan/male',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='obi_wan',
+                                    value='starwars/obi_wan/male'
+                                ),
+                                line_number=5
                             )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='obi_wan',
-                            line_number=4
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='grevious',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/grevious/male',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/grevious/male'
-                                    ),
-                                    line_number=5
-                                )
+                        ),
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='grevious',
+                            value='starwars/grevious/male',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='grevious',
+                                    value='starwars/grevious/male'
+                                ),
+                                line_number=6
                             )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='grevious',
-                            line_number=5
                         )
+                    ],
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SOUNDS,
+                        value='sounds:',
+                        line_number=4
                     )
-                ],
+                ),
+                variables=shapescape_dialogue_2.parser.VariablesNode(
+                    settings=[
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='obi_wan_title',
+                            value='Mr.',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='obi_wan_title',
+                                    value='Mr.'
+                                ),
+                                line_number=8
+                            )
+                        )
+                    ],
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.VARIABLES,
+                        value='variables:',
+                        line_number=7
+                    )
+                ),
                 token=shapescape_dialogue_2.parser.Token(
                     token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
                     value='male',
                     line_number=3
                 )
             ),
-            shapescape_dialogue_2.parser.SoundProfileNode(
+            shapescape_dialogue_2.parser.ProfileNode(
                 name='female',
-                sound_profile_variants=[
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='obi_wan',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/obi_wan/female',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/obi_wan/female'
-                                    ),
-                                    line_number=7
-                                )
+                sounds=shapescape_dialogue_2.parser.SoundsNode(
+                    settings=[
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='obi_wan',
+                            value='starwars/obi_wan/female',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='obi_wan',
+                                    value='starwars/obi_wan/female'
+                                ),
+                                line_number=11
                             )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='obi_wan',
-                            line_number=7
-                        )
-                    ),
-                    shapescape_dialogue_2.parser.SoundProfileVariant(
-                        name='grevious',
-                        settings=[
-                            shapescape_dialogue_2.parser.SettingNode(
-                                name='sound',
-                                value='starwars/grevious/apache_helicopter',
-                                token=shapescape_dialogue_2.parser.Token(
-                                    token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
-                                    value=shapescape_dialogue_2.parser.Setting(
-                                        name='sound',
-                                        value='starwars/grevious/apache_helicopter'
-                                    ),
-                                    line_number=8
-                                )
+                        ),
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='grevious',
+                            value='starwars/grevious/apache_helicopter',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='grevious',
+                                    value='starwars/grevious/apache_helicopter'
+                                ),
+                                line_number=12
                             )
-                        ],
-                        token=shapescape_dialogue_2.parser.Token(
-                            token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
-                            value='grevious',
-                            line_number=8
                         )
+                    ],
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.SOUNDS,
+                        value='sounds:',
+                        line_number=10
                     )
-                ],
+                ),
+                variables=shapescape_dialogue_2.parser.VariablesNode(
+                    settings=[
+                        shapescape_dialogue_2.parser.SettingNode(
+                            name='obi_wan_title',
+                            value='Mrs.',
+                            token=shapescape_dialogue_2.parser.Token(
+                                token_type=shapescape_dialogue_2.parser.TokenType.SETTING,
+                                value=shapescape_dialogue_2.parser.Setting(
+                                    name='obi_wan_title',
+                                    value='Mrs.'
+                                ),
+                                line_number=14
+                            )
+                        )
+                    ],
+                    token=shapescape_dialogue_2.parser.Token(
+                        token_type=shapescape_dialogue_2.parser.TokenType.VARIABLES,
+                        value='variables:',
+                        line_number=13
+                    )
+                ),
                 token=shapescape_dialogue_2.parser.Token(
                     token_type=shapescape_dialogue_2.parser.TokenType.NAMED_LABEL,
                     value='female',
-                    line_number=6
+                    line_number=9
                 )
             )
         ],
         token=shapescape_dialogue_2.parser.Token(
-            token_type=shapescape_dialogue_2.parser.TokenType.SOUND_PROFILES,
-            value='sound_profiles:',
+            token_type=shapescape_dialogue_2.parser.TokenType.PROFILES,
+            value='profiles:',
             line_number=2
         )
     )

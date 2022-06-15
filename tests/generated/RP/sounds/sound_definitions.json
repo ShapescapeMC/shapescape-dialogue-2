@@ -1,34 +1,46 @@
 {
 	"format_version": "1.14.0",
 	"sound_definitions": {
-		"sounds.starwars.obi_wan.male.hello": {
+		"sounds.zmd.female.2": {
 			"category": "music",
 			"sounds": [
-				"sounds/starwars/obi_wan/male/hello"
+				"sounds/zmd/female.2"
 			]
 		},
-		"sounds.starwars.grevious.male.general_kenobi": {
+		"sounds.zmd.female.3": {
 			"category": "music",
 			"sounds": [
-				"sounds/starwars/grevious/male/general_kenobi"
+				"sounds/zmd/female.3"
 			]
 		},
-		"sounds.starwars.rd2d.beep_boop": {
+		"sounds.zmd.female.4": {
 			"category": "music",
 			"sounds": [
-				"sounds/starwars/rd2d/beep_boop"
+				"sounds/zmd/female.4"
 			]
 		},
-		"sounds.starwars.obi_wan.female.hello": {
+		"sounds.zmd.female.5": {
 			"category": "music",
 			"sounds": [
-				"sounds/starwars/obi_wan/female/hello"
+				"sounds/zmd/female.5"
 			]
 		},
-		"sounds.starwars.grevious.apache_helicopter.general_kenobi": {
+		"sounds.zmd.female.6": {
 			"category": "music",
 			"sounds": [
-				"sounds/starwars/grevious/apache_helicopter/general_kenobi"
+				"sounds/zmd/female.6"
+			]
+		},
+		"sounds.zmd.female.7": {
+			"category": "music",
+			"sounds": [
+				"sounds/zmd/female.7"
+			]
+		},
+		"sounds.zmd.female.8": {
+			"category": "music",
+			"sounds": [
+				"sounds/zmd/female.8"
 			]
 		}
 	}

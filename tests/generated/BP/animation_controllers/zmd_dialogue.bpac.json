@@ -1,0 +1,52 @@
+{
+	"format_version": "1.17.0",
+	"animation_controllers": {
+		"controller.animation.zmd_dialogue.default": {
+			"initial_state": "default",
+			"states": {
+				"default": {
+					"transitions": [
+						{
+							"default_s0": "1.0"
+						}
+					]
+				},
+				"end": {
+					"on_entry": [
+						"@s despawn"
+					]
+				},
+				"default_s0": {
+					"transitions": [
+						{
+							"default_s1": "q.all_animations_finished"
+						}
+					],
+					"animations": [
+						"zmd_dialogue.default_s0_0"
+					]
+				},
+				"default_s1": {
+					"transitions": [
+						{
+							"default_s2": "q.all_animations_finished"
+						}
+					],
+					"animations": [
+						"zmd_dialogue.default_s1_0"
+					]
+				},
+				"default_s2": {
+					"transitions": [
+						{
+							"end": "q.all_animations_finished"
+						}
+					],
+					"animations": [
+						"zmd_dialogue.default_s2_0"
+					]
+				}
+			}
+		}
+	}
+}

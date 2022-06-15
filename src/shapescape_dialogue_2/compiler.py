@@ -662,21 +662,24 @@ class AnimationControllerTimeline:
         events: list[tuple[AnimationTimeline, ...]] = []
         timeline_deque = deque(timeline)
         while len(timeline_deque) > 0:
-            node = timeline_deque.popleft()
+            node = timeline_deque[0]
             if isinstance(node, MessageNode):
                 message_nodes: list[MessageNode] = []
                 while isinstance(node, MessageNode):
                     message_nodes.append(node)
+                    timeline_deque.popleft()
                     if len(timeline_deque) <= 0:
                         break
                     node = timeline_deque[0]
-                    timeline_deque.popleft()
+                    
                 animation_timeline = AnimationTimeline.from_message_node_list(
                     config_provider, message_nodes, rp_path, run_once_counter)
                 events.append((animation_timeline,))
             elif isinstance(node, DialogueNode):
+                timeline_deque.popleft()
                 raise NotImplementedError()
             elif isinstance(node, CameraNode):
+                timeline_deque.popleft()
                 time_settings = SettingsNode.settings_list_to_dict(
                     node.time.settings)
                 # spline_fit_degree

@@ -1,5 +1,5 @@
 # 📝 Description
-`shapescape-dialogue-2` is a Python library for generating dialogue and camera
+`shapescape-dialogue-2` is a Python package for generating dialogue and camera
 sequences for Minecraft. It's the core of the
 [shapescape_dialogue](https://github.com/ShapescapeMC/regolith-filters/tree/master/shapescape_dialogue)
 Regolith filter but it can also be used as a standalone tool (not recommended).
@@ -8,9 +8,9 @@ Regolith filter but it can also be used as a standalone tool (not recommended).
 
 > **Note**
 >
-> If you want to use this with Regolith, you don't need to install it.
+> If you want to use this package with Regolith, you don't need to install it.
 
-You can install the library with `pip` command which should be available
+You can install the package with `pip` command which should be available
 in your system if you have Python properly installed. Simply use:
 ```
 pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2
@@ -24,20 +24,21 @@ pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2@0.0.3
 
 # ⭐ Usage
 In most cases you should use this tool with Regolith. Details related
-to Regolith are explained on the [filter page](https://github.com/ShapescapeMC/regolith-filters/tree/master/shapescape_dialogue) and in the
+to Regolith are explained on the
+[filter page](https://github.com/ShapescapeMC/regolith-filters/tree/master/shapescape_dialogue)
+and in the
 [Regolith documentation](https://bedrock-oss.github.io/regolith/). The filter
-runs the main script from this library, which can also be used as a standalone
-tool. The main benefit of using the filter is that the tool is not allowed to
-delete any files, so you'll have to manually clean up the generated files every
-time you run it. Regolith works on a copy of the source and handles the
-deletion of unwanted files.
+runs the main script from this package, which can also be used as a standalone
+tool. The main benefit of using the filter is that Regolith handles the
+deletion of the files when you want to generate them again. The script itself
+is not allowed to delete or overwrite any files so without Regolith you have
+to do it yourself.
 
-The main script is accessed via command line, and it should be available once
-you have installed the library. You can use it like this:
+The main script is a command line tool, it should be available in your system
+after the installation. All of its features are explained when you run:
 ```
-shapescape-dialogue-2
+shapescape-dialogue-2 --help
 ```
-Running `shapescape-dialogue-2 --help` will show the list of available options.
 The options that start with `--debug` are for debugging purposes and they're
 not important for normal usage. The script expects you to provide the,
 source file, the namespace and the output resource pack and behavior pack
@@ -48,19 +49,14 @@ provided.
 
 ## Overview
 Dialogue files use custom syntax similar to YAML. A dialogue file can be
-devided into 3 sections:
-- **settings** (optional) - contains a list of global settings of the file.
-  Currently (version 0.0.3) it only lets you set the default properties for
-  calculating the delay lengths between the dialogue lines. These options can
-  be overritten by the individual lines.
-- **profiles** (optional) - profiles are used to generate alternative versions
-    of the dialogue. Profiles define sounds, and variables which can be later
-    used in the dialogue definition
-- **dialogue definition** - everything below the settings and profiles is the
-    dialogue definition. Dialogue definition consists of a list of nodes which
-    are used to create the dialogue.
+divided into 3 sections:
+- **settings** (optional) - settings contain a list of global settings of the
+   file.
+- **profiles** (optional) - profiles are used to generate alternate versions of
+    dialogue that differ in sounds and some text.
+- **dialogue definition** - dialogue definition consists of a list of nodes
+    which are used to create the dialogue.
 
-The nodes are described in more detail based on the example below.
 ## Example
 ```yaml
 settings: wpm=120
@@ -115,91 +111,98 @@ camera:
         blank: sound=starwars/rd2d/beep_boop.ogg time=1
 ```
 ## Settings
-**Path:** `settings` (optional, must be on top of the file)
-
-Settings are used to define default properties of some nodes. Available
-settings:
-- `wpm: float` - default values of words per minute in the dialogue delays.
-- `cpm: float` - default value of the characters per minute in the dialogue
-    delays. Works only if `wpm` is not defined. Otherwise it's ignored.
+Settings define the default values of some properties used later in the code.
+Using them is optional. The following settings are supported:
+- `wpm: float` - The default words-per-minute value used to determine the
+    dialog duration.
+- `cpm: float` - The default character-per-minute value used to determine the
+    dialog duration. If `wpm` is defined, `cpm` is ignored.
 - `title_max: int` - **NOT IMPLEMENTED** - maximum length of the title.
 
 ## Profiles
-**Path:** `profiles` (optional, must be below the `settings`)
+The `profiles` node defines profiles. Each profile is used to generate an
+alternate version of the dialog. A profile contains definitions of sound and
+text variables. Profiles are useful when you want to have two very similar
+dialogs, but with different voice acting or slightly different text (such as a
+different character name). A profile can have any name, except for the names
+reserved for other types of labels (like "settings", "camera", etc.)
 
-The profile nodes contains a list of subnodes with any name, which isn't
-reserved for other labels. Every profile contains two sections: `sounds` and
-`variables`.
-
-- `profiles->[profile]->sounds` - contains a list of custom properties with
-    which file paths which can be later used in the `sound` property of
-    message nodes. For example if `obi_wan` property in `sounds` is equal
-    to `starwars/obi_wan/male` and there is a message node which defines
-    `sound` as `obi_wan:hello.ogg`, then the actual path used for generating
-    code from this profile will be `starwars/obi_wan/male/hello.ogg`.
-- `profiles->[profile]->variables` - contains a list of variables which can
-   be inserted into text of the message nodes. For example if a profile defines
-   `obi_wan_title` as `General` and there is a message node which says:
-   `>[Grevious] {obi_wan_title} Kenobi!`, the the actual text used in the
-    dialogue will be `>[Grevious] General Kenobi!`.
+A profile can contain the following nodes:
+- `profiles->[profile]->sounds` - `sounds` is a node whose properties define
+    the roots of sound files. To refer to the sound path from a profile in the
+    dialogue, simply put it into the sound property of a message node before
+    the actual sound, separating it with a colon.
+    \
+    \
+    **Example:**\
+    In the example above, there is a sound defined as
+    `obi_wan=starwars/obi_wan/male`, the `obi_wan` variable is later reused
+    in one of the sounds like `obi_wan:hello.ogg`. This means that the dialogue
+    will use sound located at `starwars/obi_wan/male/hello.ogg`.
+- `profiles->[profile]->variables` - the variables node defines variables to
+    be reused in the text of the dialogues.
+    \
+    \
+    **Example:**\
+    There is a profile that defines `obi_wan_rank` as `General` and there is a
+    message node which says: `>[Grevious] {obi_wan_rank} Kenobi!`, the the
+    actual text used in the dialogue is be `>[Grevious] General Kenobi!`.
 
 ## Dialogue definition
 
 ### camera
-**Path:** `camera` (must be below the `profiles` cannot be used inside a
-timeline of another camera)
-
-The camera node is a special type of dialogue node, which controlls the movment
+The camera node is a special type of dialogue node, which controls the movement
 of the camera. It can only be used in the root timeline of the dialogue.
-Camera node has two parts - the list of coordinates and the timeline.
+Nesting camera nodes in other camera nodes is not allowed. Camera node has two
+parts - the list of coordinates and the timeline.
 
-The coordinates (definedt at the top of the content of the node) can be written
-in one of 3 formats:
-- `<x> <y> <z> <yaw> <pitch>` - for exmaple `1 2 3 45 90`.
+The coordinates can be written in one of 3 formats:
+- `<x> <y> <z> <yaw> <pitch>` - for example `1 2 3 45 90`.
 - `<x> <y> <z> facing <x1> <y1> <z1>` - example: `1 2 3 facing 4 5 6`
-- `<x> <y> <z> facing <selector>` - exmaple: `1 2 3 facing @p`
+- `<x> <y> <z> facing <selector>` - example: `1 2 3 facing @p`
 
-The coordinate formats match the format used in Minecraft `/tp` command. Long
-chains of coordinates that use only first or only third format can have better
-interpolation. The rotation values used in the first format don't detect
-cycles, so if you write two successive coordinates, where the first one is
-using 0 degrees rotation and the second one is using 360 degrees rotation,
-the interpolation between these two steps of animation will make the player
-do a full rotation.
+The coordinate formats match the format used in Minecraft `/tp` command. It's
+recommended to use either first or second format for entire camera animation
+because it lets the script to smoothly interpolate between frames. Mixing
+different formats in the same timeline is allowed but not recommended. While
+using the first format, it's important to know that the interpolation treats
+the rotations as normal coordinates. So interpolating between 350° and 0° does
+almost a full rotation.
 
-The `camera->timeline` can either have a `time` property which defines the
+The `camera->time` can either use a `time` property which defines the
 duration of the camera movement, or have a list of message nodes. In the latter
-case, the camera will use the duration of the sequence of message nodes to
-define the duration of the camera movement.
+case, the camera uses the duration of the sequence of message nodes to
+define the duration needed for camera movement.
 
-### Message nodes: tell, title, actionbar, blank
-**Path:** `[message node]` or `camera->[message node]` (must be below
-`profiles`, can be used inside camera timelines)
+The camera node also accepts the `spline_fit_degree` property, which defines
+the type of interpolation used for the camera movement. The default value is
+`3` (cubic spline). If you set the value to `1` you'll get a linear
+interpolation.
 
-Message nodes are the main feature of the dialogue. There is 4 types of message
-nodes: `tell`, `title`, `actionbar`, and `blank`. They behave in a very similar
-way, but have some differences. The main difference is how they are displayed.
+### Message nodes: `tell`, `title`, `actionbar`, `blank`
+Message nodes are the main feature of the dialogue. They behave in a very
+similar way. The main difference is how they are displayed and how many lines
+of text they can contain.
 
-- `tell` node displays text usig `tellraw` command.
-- `title` node displays the first line using `titleraw ... title` command, and
-    the second line using `titleraw ... subtitle`. Adding more lines to the
-    title is not supported.
-- `actionbar` node displays the text using `titleraw ... actionbar` command. It
-    can have only one message.
+- `tell` node displays text using `tellraw` command.
+- `title` node displays the first line with `titleraw ... title`, and
+    the second line with `titleraw ... subtitle`. It can't contain more than
+    two lines.
+- `actionbar` node displays the text with `titleraw ... actionbar` command. It
+    can contain only one line of text.
 - `blank` node displays nothing. It's used for running commands, loops etc.
-   without showing any message. The blank node doesn't use `wpm` and `cpm`
-   properties because there is no text to be used for calculating the delays.
+    The `blank` node requires a `time` or `sound` property as it can't use
+    `wpm` or `cpm` to determine the duration because it has no text.
 
 #### Message node properties
 Message nodes can use following properties to define their length:
 - `wpm: float` - words per minute.
-- `cpm: float` - characters per minute. Works only if `wpm` is not defined.
+- `cpm: float` - characters per minute.
 - `time: float` - duration of the message.
 - `sound: string` - path to the sound file.
 
-If none of these are defined, the message node will use the default values
-from `settings`. If multiple properties are defined, the message will use
-the one with the highest priority:
+Some of these properties can also be defined in the settings node. Here is the
+priority list used to decide which property to use:
 1. local `time`
 2. local `wpm`
 3. local `cpm`
@@ -208,26 +211,36 @@ the one with the highest priority:
 6. settings `cpm`
 
 Using a reference to a sound which doesn't exist is not an error however it
-will print a warning. This is useful when you don't have the sound available
-and need to generate placeholder dialogue.
+prints a warning. Such references are useful when you don't have sound
+available and need to generate placeholder dialogue.
 
-#### Other elements of message nodes
+#### Text and commands
 The main part of the message node is the message. Messages start with
 `>`. Message nodes can also run commands. Commands in dialogues must use the
-`/` prefix.
+`/` prefix. Messages must be defined above the commands.
 
-Message nodes also can have subnodes:
-- `run_once` - a list of commands to be executed only onece from the animation.
-   When player leaves the game during the dialogue it will start playing again
-   including all of the commands. If some commands should never be executed
-   twice (even if player exits the game) they should be marked with the
-   run_once label. Commands that give the player a reward after quest or change
-   the state the game should use this label.
-- `schedule` - shedule lets you add a delay to some commands. The schedule
-    label requires `time` property to be defined. The scheduled commands run
-    with the delay defined in time, after the message node.
-- `on_exit` - on exit is a convinient way to put a command after the time of
+#### The subnodes of message nodes
+
+Message nodes use subnodes for commands that have some additional conditions
+for being executed:
+- `run_once` - commands in this subsection of a message node are executed only
+    once, even if a certain part of the dialogue is reached multiple times.
+    This can happen when the world is reloaded while the dialogue is still
+    playing. It should be used for commands that are not supposed to be
+    executed multiple times for example when the player gets a reward or when
+    the state of the game changes.
+- `schedule` - schedule lets you run commands with a delay. The schedule
+    label requires `time` property to be defined. The timer of the delay starts
+    when the message is displayed.
+- `on_exit` - on exit is a convenient way to put a command after the time of
     the message node. It's the same as putting it in the next message node.
+- `loop` - loop repeats the message while the section of the message node is
+    being played. It uses the `time` property to determine the duration of
+    the loop.
+
+Internally, the `schedule`, `loop` and `on_exit` commands are just inserted
+into the timeline of the Minecraft BP animation. The `run_once` is handled
+by generating a tag which marks the commands as executed.
 
 ##  Comments
 Everything after `##` in a line is a comment.

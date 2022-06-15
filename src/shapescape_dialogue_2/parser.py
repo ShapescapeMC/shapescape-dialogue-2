@@ -864,7 +864,8 @@ class TimeNode:
         settings: SettingsList = []
         if token.token_type is TokenType.SETTING:
             settings = SettingsNode.parse_settings(
-                tokens, accepted_settings={"time": float})
+                tokens, accepted_settings={
+                    "time": float, "spline_fit_degree": int})
             token = tokens[0]
         # Expect indentation or finish parsing time node
         if token.token_type == TokenType.INDENT:

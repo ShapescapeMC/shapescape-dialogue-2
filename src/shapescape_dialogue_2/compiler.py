@@ -679,6 +679,16 @@ class AnimationControllerTimeline:
             elif isinstance(node, CameraNode):
                 time_settings = SettingsNode.settings_list_to_dict(
                     node.time.settings)
+                # spline_fit_degree
+                try:
+                    spline_fit_degree = int(
+                        time_settings["spline_fit_degree"])
+                except KeyError:
+                    spline_fit_degree = 3
+                except ValueError:
+                    raise CompileError(
+                        "Unable to parse spline_fit_degree as an integer. "
+                        f"Line: {node.time.token.line_number}")
                 time: int
                 # Not all camera nodes have messages
                 messages_timeline: Optional[AnimationTimeline] = None
@@ -711,7 +721,7 @@ class AnimationControllerTimeline:
                             "The 'time' property must be greater than 0. "
                             f"Line: {node.token.line_number}")
                 camera_timeline = AnimationTimeline.from_coordinates_list(
-                    node, time, spline_fit_degree=3)
+                    node, time, spline_fit_degree=spline_fit_degree)
                 if messages_timeline is not None:
                     events.append((camera_timeline, messages_timeline))
                 else:

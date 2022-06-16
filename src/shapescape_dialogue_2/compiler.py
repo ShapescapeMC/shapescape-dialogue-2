@@ -207,7 +207,7 @@ class ConfigProvider:
         '''
         # Get the text length for text messages
         full_text = ""
-        if message_node.node_type == 'blank':
+        if message_node.node_type != 'blank':
             full_text = " ".join(
                 node.text for node in message_node.text_nodes)
         # The settings of THIS node

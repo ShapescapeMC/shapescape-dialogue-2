@@ -321,7 +321,7 @@ TOKENIZER = re.Scanner([  # type: ignore
             TokenType.COORDINATES_FACING_COORDINATES,
             CoordinatesFacingCoordinates(
                 float(s.match[1]), float(s.match[2]), float(s.match[3]),
-                float(s.match[4]), float(s.match[5]), float(s.match[5]),
+                float(s.match[4]), float(s.match[5]), float(s.match[6]),
             )
         )
     ),

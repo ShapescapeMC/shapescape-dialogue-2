@@ -20,6 +20,7 @@ def wpm_duration(text:str, wpm: float) -> float:
     Returns duration of reading text based words per minute speed.
     '''
     length = len(text.split(' '))
+    print(f"DEBUG: {text} -> {length} -> duration: {(length*60)/wpm}")
     return (length*60)/wpm
 
 

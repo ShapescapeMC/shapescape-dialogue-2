@@ -1002,12 +1002,14 @@ class ScheduleNode:
         token = tokens[0]
         # Settings
         settings: SettingsList = []
-        if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(
-                tokens,
-                accepted_settings={"time": float},
-                expected_settings={"time": float})
-            token = tokens[0]
+        if token.token_type is not TokenType.SETTING:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SETTING)
+        settings = SettingsNode.parse_settings(
+            tokens,
+            accepted_settings={"time": float},
+            expected_settings={"time": float})
+        token = tokens[0]
         # Expect indentation or finish parsing schedule node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
@@ -1078,12 +1080,14 @@ class LoopNode:
         token = tokens[0]
         # Settings
         settings: SettingsList = []
-        if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(
-                tokens,
-                accepted_settings={"time": float},
-                expected_settings={"time": float})
-            token = tokens[0]
+        if not token.token_type is TokenType.SETTING:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.SETTING)
+        settings = SettingsNode.parse_settings(
+            tokens,
+            accepted_settings={"time": float},
+            expected_settings={"time": float})
+        token = tokens[0]
         # Expect indentation or finish parsing run once node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()

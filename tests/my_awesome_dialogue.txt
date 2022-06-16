@@ -14,10 +14,10 @@ profiles:
         obi_wan_title="Mrs."
 
 camera:
-    10 10 10 90 0
-    5 5 5 30 0
-    5 10 5 0 0
-    5 10 5 0 0
+    10 0 10 facing 1 0 0
+    -10 0 10 facing 2 0 0
+    -10 0 -10 facing 3 0 0
+    10 0 -10 facing 4 0 0
     time:
         blank: time=1
             /scorebard players set @a force 0

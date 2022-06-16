@@ -546,7 +546,7 @@ class AnimationTimeline:
         _, zs = b_spline_magic(
             zs, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
         events: dict[int , TimelineEvent] = {}
-        for frame, y, x, z in zip(frames, xs, ys, zs):
+        for frame, x, y, z in zip(frames, xs, ys, zs):
             frame = int(frame)
             if frame not in events:
                 events[frame] = TimelineEvent([])
@@ -627,8 +627,8 @@ class AnimationTimeline:
         _, zs = b_spline_magic(
             zs, first_frame, last_frame, frame_steps, spline_fit_degree)
         output_value = ""
-        for frame, y, x, z in zip(frames, ys, xs, zs):
-            output_value = f"{y:.2f} {x:.2f} {z:.2f}"
+        for frame, x, y, z in zip(frames, xs, ys, zs):
+            output_value = f"facing {x:.2f} {y:.2f} {z:.2f}"
             ouptut[int(frame)] = output_value
         # Repeat the last frame until the next frame
         for frame in range(last_frame, next_frame):

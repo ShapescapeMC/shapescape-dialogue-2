@@ -25,11 +25,10 @@ tell: time=1
     >Camera movement in 2
 tell: time=1
     >Camera movement in 1
-camera:
+camera: time=10
     10 10 10 90 0
     5 5 5 30 0
     5 10 5 0 0
     5 10 5 0 0
-    time: time=5
 actionbar:
     >This is the end of the animation

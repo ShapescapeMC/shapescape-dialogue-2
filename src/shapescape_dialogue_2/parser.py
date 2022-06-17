@@ -48,7 +48,7 @@ class TokenType(Enum):
     # Labels
     SETTINGS = auto()
     PROFILES = auto()
-    TIME = auto()
+    TIMELINE = auto()
     BLANK = auto()
     SCHEDULE = auto()
     ON_EXTI = auto()
@@ -82,8 +82,8 @@ class TokenType(Enum):
         # Pretty print the labels
         if self == TokenType.SETTINGS:
             return '"settings:"'
-        if self == TokenType.TIME:
-            return '"time:"'
+        if self == TokenType.TIMELINE:
+            return '"timeline:"'
         if self == TokenType.BLANK:
             return '"blank:"'
         if self == TokenType.SCHEDULE:
@@ -294,7 +294,7 @@ TOKENIZER = re.Scanner([  # type: ignore
 
     (r'settings:', lambda s, t: (TokenType.SETTINGS, t)),
     (r'profiles:', lambda s, t: (TokenType.PROFILES, t)),
-    (r'time:', lambda s, t: (TokenType.TIME, t)),
+    (r'timeline:', lambda s, t: (TokenType.TIMELINE, t)),
     (r'blank:', lambda s, t: (TokenType.BLANK, t)),
     (r'schedule:', lambda s, t: (TokenType.SCHEDULE, t)),
     (r'on_exti:', lambda s, t: (TokenType.ON_EXTI, t)),
@@ -809,8 +809,9 @@ class DialogueOptionNode:
 @dataclass
 class CameraNode:
     coordinates: list[CoordinatesNode]
+    settings: SettingsList
     token: Token
-    time: TimeNode
+    timeline: Optional[TimelineNode]
 
     @staticmethod
     def from_token_stack(tokens: deque[Token]) -> CameraNode:
@@ -819,8 +820,14 @@ class CameraNode:
         if token.token_type is not TokenType.CAMERA:
             raise ParseError.from_unexpected_token(
                 token, TokenType.CAMERA)
-        # Expect indentation or finish parsing camera node
         token = tokens[0]
+        # Settings
+        settings: SettingsList = []
+        if token.token_type is TokenType.SETTING:
+            settings = SettingsNode.parse_settings(
+                tokens, accepted_settings={"time": float, "interpolation_mode": int})
+            token = tokens[0]
+        # Expect indentation or finish parsing camera node
         if token.token_type is not TokenType.INDENT:
             raise ParseError.from_unexpected_token(
                 token, TokenType.INDENT)
@@ -834,46 +841,37 @@ class CameraNode:
                 TokenType.COORDINATES_FACING_ENTITY):
             coordinates.append(CoordinatesNode.from_token_stack(tokens))
             token = tokens[0]
-        # Time
-        if token.token_type is not TokenType.TIME:
-            raise ParseError.from_unexpected_token(token, TokenType.TIME)
-        time = TimeNode.from_token_stack(tokens)
-
-        #  Why was this here? This type was impossible due to the previous 
-        # check:
-        # Expecte DEDENT or EOF, don't pop EOF
-        # if token.token_type is TokenType.DEDENT:
-        #     tokens.popleft()
-        return CameraNode(coordinates, root_token, time)
+        # Timeline
+        timeline: Optional[TimelineNode] = None
+        if token.token_type is TokenType.TIMELINE:
+            timeline = TimelineNode.from_token_stack(tokens)
+        elif token.token_type == TokenType.DEDENT:
+            tokens.popleft()
+        else:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.TIMELINE, TokenType.DEDENT)
+        return CameraNode(coordinates, settings, root_token, timeline)
 
 @dataclass
-class TimeNode:
-    settings: SettingsList
+class TimelineNode:
     messages: list[MessageNode]
     token: Token
 
     @staticmethod
-    def from_token_stack(tokens: deque[Token]) -> TimeNode:
+    def from_token_stack(tokens: deque[Token]) -> TimelineNode:
         token = tokens.popleft()
         root_token = token
-        if token.token_type is not TokenType.TIME:
+        if token.token_type is not TokenType.TIMELINE:
             raise ParseError.from_unexpected_token(
-                token, TokenType.TIME)
+                token, TokenType.TIMELINE)
         token = tokens[0]
-        # Settings
-        settings: SettingsList = []
-        if token.token_type is TokenType.SETTING:
-            settings = SettingsNode.parse_settings(
-                tokens, accepted_settings={
-                    "time": float, "spline_fit_degree": int})
-            token = tokens[0]
         # Expect indentation or finish parsing time node
         if token.token_type == TokenType.INDENT:
             tokens.popleft()
             token = tokens[0]
         elif token.token_type == TokenType.DEDENT:
             tokens.popleft()
-            return TimeNode(settings, [], root_token)
+            return TimelineNode([], root_token)
         else:
             raise ParseError.from_unexpected_token(
                 token, TokenType.INDENT, TokenType.DEDENT)
@@ -887,11 +885,11 @@ class TimeNode:
         # Expect DEDENT or EOF, don't pop EOF
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        # Double dedent. This part of code is reachable only if 'time' has
+        # Double dedent. This part of code is reachable only if 'timeline' has
         # subnodes
         if token.token_type is TokenType.DEDENT:
             tokens.popleft()
-        return TimeNode(settings, messages, root_token)
+        return TimelineNode(messages, root_token)
 
 @dataclass
 class CoordinatesNode:

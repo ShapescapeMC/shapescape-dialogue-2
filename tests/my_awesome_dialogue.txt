@@ -13,12 +13,12 @@ profiles:
         variables:
         obi_wan_title="Mrs."
 
-camera:
+camera: interpolation_mode=1
     10 0 10 facing 1 0 0
     -10 0 10 facing 2 0 0
     -10 0 -10 facing 3 0 0
     10 0 -10 facing 4 0 0
-    time:
+    timeline:
         blank: time=1
             /scorebard players set @a force 0
             run_once:

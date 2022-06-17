@@ -681,36 +681,40 @@ class AnimationControllerTimeline:
             elif isinstance(node, CameraNode):
                 timeline_deque.popleft()
                 time_settings = SettingsNode.settings_list_to_dict(
-                    node.time.settings)
+                    node.settings)
                 # spline_fit_degree
                 try:
                     spline_fit_degree = int(
-                        time_settings["spline_fit_degree"])
+                        time_settings["interpolation_mode"])
                 except KeyError:
                     spline_fit_degree = 3
                 except ValueError:
                     raise CompileError(
-                        "Unable to parse spline_fit_degree as an integer. "
-                        f"Line: {node.time.token.line_number}")
+                        "Unable to parse 'interpolation_mode' as an integer. "
+                        f"Line: {node.token.line_number}")
                 time: int
                 # Not all camera nodes have messages
                 messages_timeline: Optional[AnimationTimeline] = None
-                if len(node.time.messages) > 0:
+                if node.timeline is not None:
                     if 'time' in time_settings:
                         raise CompileError(
-                            "When using message nodes in the camera node,"
+                            "When using a timeline camera node,"
                             " the 'time' setting is not allowed. "
                             f"Line: {node.token.line_number}")
+                    if len(node.timeline.messages) <= 0:
+                        raise CompileError(
+                            "The timeline in camera node must have at least"
+                            f" one message. Line: {node.token.line_number}")
                     messages_timeline = (
                         AnimationTimeline.from_message_node_list(
-                            config_provider, node.time.messages, rp_path,
+                            config_provider, node.timeline.messages, rp_path,
                             run_once_counter)
                     )
                     time = messages_timeline.time
                 else:
                     if 'time' not in time_settings:
                         raise CompileError(
-                            "When using message nodes in the camera node,"
+                            "When not using timeline in the camera node,"
                             " the 'time' setting is required. "
                             f"Line: {node.token.line_number}")
                     try:

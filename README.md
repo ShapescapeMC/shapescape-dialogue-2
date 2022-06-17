@@ -79,12 +79,12 @@ tell:
 tell:
     > ...tere was an epic fight between General Grevious and Obi-Wan Kenobi.
 
-camera:
+camera: interpolation_mode=1
     10 10 10 90 0
     5 5 5 30 0
     5 10 5 0 0
     5 10 5 0 0
-    time:
+    timeline:
         blank: time=1
             /scorebard players set @a force 0
             run_once:
@@ -169,15 +169,21 @@ using the first format, it's important to know that the interpolation treats
 the rotations as normal coordinates. So interpolating between 350° and 0° does
 almost a full rotation.
 
-The `camera->time` can either use a `time` property which defines the
-duration of the camera movement, or have a list of message nodes. In the latter
-case, the camera uses the duration of the sequence of message nodes to
-define the duration needed for camera movement.
+The `camera` can either use a `time` property which defines the
+duration of the camera movement, or have a list of message nodes in its
+sub-node called `timeline`. In the latter case, the camera uses the
+duration of the sequence of message nodes to define the duration needed for
+camera movement.
 
-The camera node also accepts the `spline_fit_degree` property, which defines
-the type of interpolation used for the camera movement. The default value is
-`3` (cubic spline). If you set the value to `1` you'll get a linear
-interpolation.
+The `camera` node also accepts the `interpolation_mode` property, which defines
+the type of interpolation used for the camera movement.  The argument accepts
+an integer value from 0 to 3. The value refers to the order of the spline
+interpolation:
+- 0 - no interpolation, discrete jumps between keyframes.
+- 1 - linear
+- 2 - quadratic
+- 3 - cubic
+The default value is 3.
 
 ### Message nodes: `tell`, `title`, `actionbar`, `blank`
 Message nodes are the main feature of the dialogue. They behave in a very

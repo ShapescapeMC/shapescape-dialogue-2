@@ -214,7 +214,7 @@ class ConfigProvider:
         node_settings = ConfigProvider.parse_settings(message_node.settings)
         # Try using local settings
         if 'time' in node_settings:
-            return seconds_to_ticks(node_settings['time'])
+            return seconds_to_halfticks(node_settings['time'])
         if 'wpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'wpm')
@@ -223,7 +223,7 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'wpm')
-            return seconds_to_ticks(wpm_duration(full_text, wpm))
+            return seconds_to_halfticks(wpm_duration(full_text, wpm))
         if 'cpm' in node_settings:
             if message_node.node_type == 'blank':
                 raise CompileError.from_invalid_setting(message_node, 'cpm')
@@ -232,19 +232,19 @@ class ConfigProvider:
             except (ValueError, TypeError):
                 raise CompileError.from_invalid_setting_value(
                     message_node, 'cpm')
-            return seconds_to_ticks(cpm_duration(full_text, cpm))
+            return seconds_to_halfticks(cpm_duration(full_text, cpm))
         if 'sound' in node_settings:
             sound_path = self.resolve_sound_path(
                 node_settings['sound'], message_node)
             duration = sound_duration(rp_path / sound_path)
             if duration is not None:
-                return seconds_to_ticks(duration)
+                return seconds_to_halfticks(duration)
         # 'wpm' and 'cpm' shouldn't give errors from 'blank' message nodes
         # if these properties are implemented in global settings
         if 'wpm' in self.settings and message_node.node_type != 'blank':
-            return seconds_to_ticks(wpm_duration(full_text, float(self.settings['wpm'])))
+            return seconds_to_halfticks(wpm_duration(full_text, float(self.settings['wpm'])))
         if 'cpm' in self.settings and message_node.node_type != 'blank':
-            return seconds_to_ticks(cpm_duration(full_text, float(self.settings['cpm'])))
+            return seconds_to_halfticks(cpm_duration(full_text, float(self.settings['cpm'])))
         # TODO - Should I use 'time' property from global settings? Should
         # the local and global settings be converted to a proper type before
         # we reach this point?
@@ -469,7 +469,7 @@ class AnimationTimeline:
                     'command', f"tag @s add {run_once_id}", None))
                 add_event_action(time, *run_once_actions)
             for schedule_node in node.schedule_nodes:
-                schedule_time = seconds_to_ticks(  # Should be safe (parser checks that)
+                schedule_time = seconds_to_halfticks(  # Should be safe (parser checks that)
                     ConfigProvider.parse_settings(
                         schedule_node.settings)['time'])
                 scheduled_actions = [
@@ -480,7 +480,7 @@ class AnimationTimeline:
                 ]
                 add_event_action(time + schedule_time, *scheduled_actions)
             for loop_node in node.loop_nodes:
-                loop_time = seconds_to_ticks(  # This should be safe (parser checks that)
+                loop_time = seconds_to_halfticks(  # This should be safe (parser checks that)
                     ConfigProvider.parse_settings(
                         loop_node.settings)['time'])
                 if loop_time <= 0:
@@ -714,7 +714,7 @@ class AnimationControllerTimeline:
                             " the 'time' setting is required. "
                             f"Line: {node.token.line_number}")
                     try:
-                        time = seconds_to_ticks(time_settings['time'])
+                        time = seconds_to_halfticks(time_settings['time'])
                     except ValueError:
                         raise CompileError(
                             "Unable to convert the 'time' property to a "
@@ -733,12 +733,16 @@ class AnimationControllerTimeline:
                 raise ValueError(f"Unknown node type: {node}")
         return AnimationControllerTimeline(events)
 
-def seconds_to_ticks(duration: Union[float, str, int]) -> int:
+def seconds_to_halfticks(duration: Union[float, str, int]) -> int:
     '''
-    Converts duration in seconds to tick count. The values are always rounded
-    up.
+    Converts duration in seconds to half-tick count. The values are always
+    rounded up. A half-tick is a half of a tick. There is 40 half-ticks in
+    a second.
+
+    The generator uses half-ticks instead of ticks to make camera movement
+    in animations move more smoothly in case of skipping frames.
     '''
-    return int(math.ceil(float(duration) * 20))
+    return int(math.ceil(float(duration) * 40))
 
 
 def b_spline_magic(

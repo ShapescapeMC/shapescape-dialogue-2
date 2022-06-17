@@ -539,11 +539,11 @@ class AnimationTimeline:
             ys.append(c.coordinates.y)
             zs.append(c.coordinates.z)
         n_frames = keyframes[-1] - keyframes[0]
-        frames, xs = b_spline_magic(
+        frames, xs = interp1d_magic(
             xs, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
-        _, ys = b_spline_magic(
+        _, ys = interp1d_magic(
             ys, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
-        _, zs = b_spline_magic(
+        _, zs = interp1d_magic(
             zs, keyframes[0], keyframes[-1], n_frames, spline_fit_degree)
         events: dict[int , TimelineEvent] = {}
         for frame, x, y, z in zip(frames, xs, ys, zs):
@@ -580,9 +580,9 @@ class AnimationTimeline:
                 break
             next_frame, c = frames_stack.popleft()
         frame_steps = last_frame - first_frame
-        frames, ys = b_spline_magic(
+        frames, ys = interp1d_magic(
             ys, first_frame, last_frame, frame_steps, spline_fit_degree)
-        _, xs = b_spline_magic(
+        _, xs = interp1d_magic(
             xs, first_frame, last_frame, frame_steps, spline_fit_degree)
         output_value = ""
         for frame, y, x in zip(frames, ys, xs):
@@ -620,11 +620,11 @@ class AnimationTimeline:
                 break
             next_frame, c = frames_stack.popleft()
         frame_steps = last_frame - first_frame
-        frames, xs = b_spline_magic(
+        frames, xs = interp1d_magic(
             xs, first_frame, last_frame, frame_steps, spline_fit_degree)
-        _, ys = b_spline_magic(
+        _, ys = interp1d_magic(
             ys, first_frame, last_frame, frame_steps, spline_fit_degree)
-        _, zs = b_spline_magic(
+        _, zs = interp1d_magic(
             zs, first_frame, last_frame, frame_steps, spline_fit_degree)
         output_value = ""
         for frame, x, y, z in zip(frames, xs, ys, zs):
@@ -740,6 +740,7 @@ def seconds_to_ticks(duration: Union[float, str, int]) -> int:
     '''
     return int(math.ceil(float(duration) * 20))
 
+
 def b_spline_magic(
         y: list[float], x_start: float, x_end: float,
         n_points: int, k: int=3) -> tuple[list[float], list[float]]:
@@ -756,6 +757,9 @@ def b_spline_magic(
     - k=2 - quadratic
     - k=3 - cubic
     ...goes up to 5
+
+    THIS IS A LEGACY CODE. THE FUNCTION IS DEPRECATED, USE THE interp1d_magic
+    FUNCTION INSTEAD.
     '''
     # Useful links:
     # https://www.delftstack.com/howto/python/python-spline/
@@ -770,3 +774,38 @@ def b_spline_magic(
     # Recast that to lists of floats just to make sure that errors are
     # detected early.
     return [float(x) for x in x_fit], [float(y) for y in y_fit]
+
+def interp1d_magic(
+        y: list[float], x_start: float, x_end: float,
+        n_points: int, k: int=3) -> tuple[list[float], list[float]]:
+    '''
+    Thie iterp1d_magic function uses science to magically calculate points
+    interpolated between values passed to the function. The difference between
+    this function and the b_spline_magic is that the points are evenly spaced
+    on the x-axis, not on the curve (or at least I think it's the difference,
+    I'm not sure because it's all done in Scipy).
+
+    The interp1d_magic uses scipy.interpolate.interp1d and the b_spline_magic
+    uses scipy.interpolate.splev.
+    '''
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d
+    # The kind values for scipy.interpolate.interp1d are:
+    # - 'zero', 'slinear', 'linear', 'cubic', 'quadratic' - for different
+    #   spline interpolation degree. 'slinear' is spline of degree 1. It
+    #   returns the same (very similar) result as 'linear' but is slower.
+    # - 'nearest', 'nearest-up', 'previous', 'next' - not used. Look into docs.
+    #   You can use it to get the stepped animation.
+    if k < 0 or k > 3:
+        raise CompileError(
+            "The interpolation level parameter must be between 0 and 3.")
+    kind: Literal['zero', 'linear', 'quadratic', 'cubic'] = (
+        'zero', 'linear', 'quadratic', 'cubic')[k]
+    x = np.linspace(x_start, x_end, len(y))
+    interp_func = scipy.interpolate.interp1d(x, y, kind=kind)
+
+    interp_x = np.linspace(x_start, x_end, n_points)
+    interp_y = interp_func(interp_x)
+    return (
+        [float(x_val) for x_val in interp_x],
+        [float(y_val) for y_val in interp_y]
+    )

@@ -515,6 +515,10 @@ class AnimationTimeline:
         '''
         Creates a AnimationTimeline from a CameraNode.
         '''
+        # TODO - this is a bit of a hack, but it works for now. Otherwise the
+        # passing 1 value for camera node to the wouldn't work.
+        if len(camera_node.coordinates) < 2:
+            camera_node.coordinates.append(camera_node.coordinates[0])
         keyframes: list[int] = list(np.linspace(
             0, time, len(camera_node.coordinates), dtype=int))
         # A stack for processing the keyframes
@@ -828,7 +832,6 @@ def interp1d_magic(
     x = np.linspace(x_start, x_end, len(y))
     interp_func = scipy.interpolate.interp1d(
         x, y, kind=kind, fill_value='extrapolate')
-
     interp_x = np.linspace(x_start, x_end, n_points)
     interp_y = interp_func(interp_x)
     return (

@@ -1,0 +1,87 @@
+settings: wpm=120 title_max=15
+
+camera:
+    1615 28 1136 0 0
+    timeline:
+        blank: time=3
+            /title @a title shapescape:image_popup_0
+            /effect @a invisibility 999999 10 true
+
+camera: interpolation_mode=1
+    ## The original shot
+    1615 28 1136 0 0
+    ## Extended animation
+    1615 28 1183 0 0
+    timeline:
+        actionbar: sound=cutscenes/polar_bear_1.ogg
+            >§3At the top of the planet lies an icy wilderness,
+        actionbar: sound=cutscenes/polar_bear_2.ogg
+            >§3not of land, but of sea ice.
+
+
+
+camera: interpolation_mode=1
+    ## The original shot
+    1518 45 752 90 0
+    ## Extended animation
+    1475 45 752 90 0
+    timeline:
+        blank: time=0.2
+        actionbar: sound=cutscenes/polar_bear_3.ogg
+            >§3The Arctic Ocean.
+        actionbar: sound=cutscenes/polar_bear_4.ogg
+            >§3In winter, its so cold that its surface waters freeze
+        actionbar: sound=cutscenes/polar_bear_5.ogg
+            >§3to form a solid ice platform.
+        actionbar: sound=cutscenes/polar_bear_6.ogg
+            >§3It may look like a wasteland,
+        blank: time=0.025
+            run_once:
+                /kill @e[type=shapescape:cam_polar_bear]
+                /summon shapescape:cam_polar_bear
+                /tp @e[type=shapescape:cam_polar_bear,c=1] 1101 27 659
+
+camera:
+    1108 26 659 90 0
+    timeline:
+        actionbar: sound=cutscenes/polar_bear_7.ogg
+            >§3but for the Arctic's unique wildlife, the sea ice is a pristine wonderland.
+        ## Resummon the polar bear for the next scene
+        blank: time=0.025
+            run_once:
+                /kill @e[type=shapescape:cam_polar_bear]
+                /summon shapescape:cam_polar_bear
+                /tp @e[type=shapescape:cam_polar_bear,c=1] 1297 22 602
+
+camera: interpolation_mode=1
+    ## The original shot
+    1277 35 602 -90 35
+    ## Extended animation
+    1298 35 602 -90 35
+    timeline:
+        blank: time=0.2
+        actionbar: sound=cutscenes/polar_bear_8.ogg
+            >§3To survive here, life must adapt
+        actionbar: sound=cutscenes/polar_bear_9.ogg
+            >§3to the shapeshifting world of water and ice.
+            ## Resummon the polar bear for the next scene
+        blank: time=0.025
+            run_once:
+                /kill @e[type=shapescape:cam_polar_bear]
+                /summon shapescape:cam_polar_bear
+                /tp @e[type=shapescape:cam_polar_bear,c=1] 955 27 1553
+
+camera: interpolation_mode=2
+    ## The original shot TODO - replace with facing entity (Not Implemented)
+    961 28 1564 facing 955 27 1553
+    ## Extended animation
+    947 29 1565 facing 955 27 1553
+    940 31 1552 facing 955 27 1553
+    timeline:
+        actionbar: sound=cutscenes/polar_bear_10.ogg
+            >§3Newly emerged polar bear moms lead cubs
+        actionbar: sound=cutscenes/polar_bear_11.ogg
+            >§3to take their first tentative steps on the sea ice
+        blank: time=0.025
+            /effect @a invisibility 0 0 true
+            /kill @e[type=shapescape:cam_polar_bear]

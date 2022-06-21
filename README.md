@@ -183,7 +183,9 @@ interpolation:
 - 1 - linear
 - 2 - quadratic
 - 3 - cubic
-The default value is 3.
+The default value is 3. The interpolation mode value must be lower than the
+number of points to interpolate. If not enough points is provided the
+interpolation mode is automatically downgraded to the lowest possible value.
 
 ### Message nodes: `tell`, `title`, `actionbar`, `blank`
 Message nodes are the main feature of the dialogue. They behave in a very

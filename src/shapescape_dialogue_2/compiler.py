@@ -511,7 +511,7 @@ class AnimationTimeline:
     @staticmethod
     def from_coordinates_list(
             camera_node: CameraNode,
-            time: int, spline_fit_degree: int=3) -> AnimationTimeline:
+            time: int, tp_selector: str, spline_fit_degree: int=3) -> AnimationTimeline:
         '''
         Creates a AnimationTimeline from a CameraNode.
         '''
@@ -563,7 +563,9 @@ class AnimationTimeline:
             frame = int(frame)
             if frame not in events:
                 events[frame] = TimelineEvent([])
-            output_value = f"tp @a {x:.2f} {y:.2f} {z:.2f} {rotation_suffixes[frame]}"
+            output_value = (
+                f"tp {tp_selector} {x:.2f} {y:.2f} {z:.2f} "
+                f"{rotation_suffixes[frame]}")
             events[frame].actions.append(
                 TimelineEventAction("command", output_value, None))
         return AnimationTimeline(events, time)
@@ -693,12 +695,12 @@ class AnimationControllerTimeline:
                 raise NotImplementedError()
             elif isinstance(node, CameraNode):
                 timeline_deque.popleft()
-                time_settings = SettingsNode.settings_list_to_dict(
+                camera_settings = SettingsNode.settings_list_to_dict(
                     node.settings)
                 # spline_fit_degree
                 try:
                     spline_fit_degree = int(
-                        time_settings["interpolation_mode"])
+                        camera_settings["interpolation_mode"])
                 except KeyError:
                     spline_fit_degree = 3
                 except ValueError:
@@ -709,7 +711,7 @@ class AnimationControllerTimeline:
                 # Not all camera nodes have messages
                 messages_timeline: Optional[AnimationTimeline] = None
                 if node.timeline is not None:
-                    if 'time' in time_settings:
+                    if 'time' in camera_settings:
                         raise CompileError(
                             "When using a timeline camera node,"
                             " the 'time' setting is not allowed. "
@@ -725,13 +727,13 @@ class AnimationControllerTimeline:
                     )
                     time = messages_timeline.time
                 else:
-                    if 'time' not in time_settings:
+                    if 'time' not in camera_settings:
                         raise CompileError(
                             "When not using timeline in the camera node,"
                             " the 'time' setting is required. "
                             f"Line: {node.token.line_number}")
                     try:
-                        time = seconds_to_halfticks(time_settings['time'])
+                        time = seconds_to_halfticks(camera_settings['time'])
                     except ValueError:
                         raise CompileError(
                             "Unable to convert the 'time' property to a "
@@ -740,8 +742,10 @@ class AnimationControllerTimeline:
                         raise CompileError(
                             "The 'time' property must be greater than 0. "
                             f"Line: {node.token.line_number}")
+                combined_settings = config_provider.settings | camera_settings
                 camera_timeline = AnimationTimeline.from_coordinates_list(
-                    node, time, spline_fit_degree=spline_fit_degree)
+                    node, time, combined_settings.get('tp_selector', '@a'),
+                    spline_fit_degree=spline_fit_degree)
                 if messages_timeline is not None:
                     events.append((camera_timeline, messages_timeline))
                 else:

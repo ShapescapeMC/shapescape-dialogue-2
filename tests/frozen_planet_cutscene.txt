@@ -1,6 +1,6 @@
-settings: wpm=120 title_max=15
+settings: wpm=120 title_max=15 tp_selector=@e[type=pig]
 
-camera:
+camera: tp_selector=@e[type=your_mom]
     1615 28 1136 0 0
     timeline:
         blank: time=3

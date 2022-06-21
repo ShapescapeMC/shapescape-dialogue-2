@@ -454,7 +454,9 @@ class SettingsNode:
                 token, TokenType.SETTINGS)
         settings = SettingsNode.parse_settings(
             tokens,
-            accepted_settings={"wpm": float, "cpm": float, "title_max": int}
+            accepted_settings={
+                "wpm": float, "cpm": float, "title_max": int,
+                "tp_selector": str}
         )
         return SettingsNode(settings, root_token)
 
@@ -825,7 +827,9 @@ class CameraNode:
         settings: SettingsList = []
         if token.token_type is TokenType.SETTING:
             settings = SettingsNode.parse_settings(
-                tokens, accepted_settings={"time": float, "interpolation_mode": int})
+                tokens, accepted_settings={
+                    "time": float, "interpolation_mode": int,
+                    "tp_selector": str})
             token = tokens[0]
         # Expect indentation or finish parsing camera node
         if token.token_type is not TokenType.INDENT:

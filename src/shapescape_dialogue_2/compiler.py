@@ -429,16 +429,25 @@ class AnimationTimeline:
                         f"has {len(node.text_nodes)}. Line "
                         f"{node.token.line_number}") 
             elif node.node_type == 'actionbar':
+                # Doesn't need to repeat that often (0.5s is enough)
+                loop_time = seconds_to_halfticks(0.5)
                 if len(node.text_nodes) != 1:
                     raise CompileError(
                         "Actionbar node should have exactly one text "
                         f"node {node.token.line_number}")
-                actions = [  # The messages
-                    TimelineEventAction(
+                text_node = node.text_nodes[0]
+                action = TimelineEventAction(
                         'actionbar', text_node.text,
                         text_node.token.line_number)
-                    for text_node in node.text_nodes
-                ]
+                loop_time_sum = 0
+                while loop_time_sum < duration:
+                    add_event_action(time + loop_time_sum, action)
+                    loop_time_sum += loop_time
+                # Add the last action exactly at the end of the node
+                add_event_action(time + duration, action)
+                # Actions for the commands (must be defined here even though
+                # they are not used here)
+                actions = []
             else:
                 raise ValueError("Unknown MessageNode type")
             actions += [

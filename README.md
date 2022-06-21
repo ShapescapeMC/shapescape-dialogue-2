@@ -118,6 +118,8 @@ Using them is optional. The following settings are supported:
 - `cpm: float` - The default character-per-minute value used to determine the
     dialog duration. If `wpm` is defined, `cpm` is ignored.
 - `title_max: int` - **NOT IMPLEMENTED** - maximum length of the title.
+- `tp_selector: string` - the selector used in the `/tp` commands of the camera
+   nodes. By default it uses `@a`.
 
 ## Profiles
 The `profiles` node defines profiles. Each profile is used to generate an
@@ -186,6 +188,9 @@ interpolation:
 The default value is 3. The interpolation mode value must be lower than the
 number of points to interpolate. If not enough points is provided the
 interpolation mode is automatically downgraded to the lowest possible value.
+
+The `tp_selector` property of the camera sets the target selector used for the
+`/tp` command. By default it's set to `@a`.
 
 ### Message nodes: `tell`, `title`, `actionbar`, `blank`
 Message nodes are the main feature of the dialogue. They behave in a very

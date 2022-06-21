@@ -815,10 +815,19 @@ def interp1d_magic(
     if k < 0 or k > 3:
         raise CompileError(
             "The interpolation level parameter must be between 0 and 3.")
+    if len(y) == 0:
+        raise CompileError(
+            "The length of the vector for the interpolation must be greater"
+            "than 0.")
+    # Downgrade the interpolation degree if the length of the vector is not
+    # enough to use the selected one (the number of points must be greater
+    # than the interpolation degree)
+    k = min(k, len(y)-1)
     kind: Literal['zero', 'linear', 'quadratic', 'cubic'] = (
         'zero', 'linear', 'quadratic', 'cubic')[k]
     x = np.linspace(x_start, x_end, len(y))
-    interp_func = scipy.interpolate.interp1d(x, y, kind=kind)
+    interp_func = scipy.interpolate.interp1d(
+        x, y, kind=kind, fill_value='extrapolate')
 
     interp_x = np.linspace(x_start, x_end, n_points)
     interp_y = interp_func(interp_x)

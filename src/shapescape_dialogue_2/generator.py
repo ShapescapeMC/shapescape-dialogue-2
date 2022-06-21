@@ -296,10 +296,12 @@ class BpaGenerator:
 
         # Check if timeline is not empty
         len_timeline = len(timeline.events)
-        if len_timeline == 0:
-            raise GeneratorError(
-                f"Unable to generate the '{short_bpa_id}' animation because "
-                "provided animation timeline is empty.")
+
+        # SKIP THIS ERROR, BLANK WAIT ANIMATIONS ARE POSSIBLE.
+        # if len_timeline == 0:
+        #     raise GeneratorError(
+        #         f"Unable to generate the '{short_bpa_id}' animation because "
+        #         "provided animation timeline is empty.")
 
         # Create animation content
         data: dict[str, Any] = {
@@ -319,7 +321,7 @@ class BpaGenerator:
                     context.sc_provider,
                     config_provider)
                 data['timeline'][str(time)] = [f"/{command}"]
-            else:
+            elif len(event.actions) > 1:   # Not accessed for empty timelines
                 mcfunction_generator.add_writer(
                     full_function_id, event, context,
                     config_provider)

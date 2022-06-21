@@ -835,6 +835,14 @@ class CameraNode:
         # Coordinates
         coordinates = []
         token = tokens[0]
+        if token.token_type not in (
+                TokenType.COORDINATES_ROTATED,
+                TokenType.COORDINATES_FACING_COORDINATES,
+                TokenType.COORDINATES_FACING_ENTITY):
+            raise ParseError.from_unexpected_token(
+                token,
+                TokenType.INDENT, TokenType.COORDINATES_FACING_COORDINATES,
+                TokenType.COORDINATES_FACING_ENTITY)
         while token.token_type in (
                 TokenType.COORDINATES_ROTATED,
                 TokenType.COORDINATES_FACING_COORDINATES,

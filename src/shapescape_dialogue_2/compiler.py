@@ -517,7 +517,7 @@ class AnimationTimeline:
         '''
         # TODO - this is a bit of a hack, but it works for now. Otherwise the
         # passing 1 value for camera node to the wouldn't work.
-        if len(camera_node.coordinates) < 2:
+        if len(camera_node.coordinates) == 1:
             camera_node.coordinates.append(camera_node.coordinates[0])
         keyframes: list[int] = list(np.linspace(
             0, time, len(camera_node.coordinates), dtype=int))
@@ -594,7 +594,10 @@ class AnimationTimeline:
             xs.append(c.coordinates.x_rot)
             if len(frames_stack) == 0:
                 break
-            next_frame, c = frames_stack.popleft()
+            frames_stack.popleft()
+            if len(frames_stack) == 0:
+                break
+            next_frame, c = frames_stack[0]
         frame_steps = last_frame - first_frame
         frames, ys = interp1d_magic(
             ys, first_frame, last_frame, frame_steps, spline_fit_degree)
@@ -632,7 +635,10 @@ class AnimationTimeline:
             zs.append(c.coordinates.facing_z)
             if len(frames_stack) == 0:
                 break
-            next_frame, c = frames_stack.popleft()
+            frames_stack.popleft()
+            if len(frames_stack) == 0:
+                break
+            next_frame, c = frames_stack[0]
         frame_steps = last_frame - first_frame
         frames, xs = interp1d_magic(
             xs, first_frame, last_frame, frame_steps, spline_fit_degree)
@@ -859,8 +865,13 @@ def interp1d_magic(
     kind: Literal['zero', 'linear', 'quadratic', 'cubic'] = (
         'zero', 'linear', 'quadratic', 'cubic')[k]
     x = np.linspace(x_start, x_end, len(y))
-    interp_func = scipy.interpolate.interp1d(
-        x, y, kind=kind, fill_value='extrapolate')
+
+    if kind == 'zero':
+        interp_func = scipy.interpolate.interp1d(
+            x, y, kind=kind, fill_value='extrapolate')
+    else:
+        interp_func = scipy.interpolate.interp1d(x, y, kind=kind)
+
     interp_x = np.linspace(x_start, x_end, n_points)
     interp_y = interp_func(interp_x)
     return (

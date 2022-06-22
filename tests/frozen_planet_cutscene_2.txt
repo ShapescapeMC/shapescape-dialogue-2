@@ -1,0 +1,19 @@
+settings: wpm=120 title_max=15
+camera: interpolation_mode=1
+    1617 14 1482 facing 1625 19 1472
+    1617 14 1482 facing 1633 3 1478
+    timeline:
+        blank: time=0.05
+            run_once:
+                /event entity @e[family=actor] shapescape:despawn
+                /summon shapescape:seal_actor ~ ~ ~
+                /tp @e[type=shapescape:seal_actor,c=1] 1625 19 1472 facing 1633 3 1478
+                /summon shapescape:ai_goal ~ ~ ~
+                /tp @e[type=shapescape:ai_goal,c=1] 1633 3 1478
+        actionbar: 
+            >§3The ringed seal on which she depends feed on fish, 90 meters below her feet
+            loop: time=0.1
+                /execute @e[type=shapescape:seal_actor] ~~~ tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]
+        blank: time=2.8
+            loop: time=0.1
+                /execute @e[type=shapescape:seal_actor] ~~~ tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]

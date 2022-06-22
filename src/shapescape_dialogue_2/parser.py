@@ -327,7 +327,7 @@ TOKENIZER = re.Scanner([  # type: ignore
     ),
     (
         f'({float_pattern}) ({float_pattern}) ({float_pattern}) facing'
-            r' \S+',
+            r' (\S+)',
         lambda s, t: (
             TokenType.COORDINATES_FACING_ENTITY,
             CoordinatesFacingEntity(

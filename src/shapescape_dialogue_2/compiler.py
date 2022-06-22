@@ -154,7 +154,7 @@ class ConfigProvider:
                 (match := insertion_pattern.search(text[cursor:]))):
             start, end = cursor+match.start(), cursor+match.end()
             try:
-                replace.append((start, end, self.variables[match[1]])) 
+                replace.append((start, end, self.variables[match[1]]))
             except KeyError as e:
                 raise CompileError(
                     f"Reference to undefined variable \"{e}\"" +
@@ -411,7 +411,7 @@ class AnimationTimeline:
                 if len(node.text_nodes) == 1:
                     actions = [  # The title
                         TimelineEventAction(
-                            'title', node.text_nodes[0].text, 
+                            'title', node.text_nodes[0].text,
                             node.text_nodes[0].token.line_number)
                     ]
                 elif len(node.text_nodes) == 2:
@@ -427,7 +427,7 @@ class AnimationTimeline:
                     raise CompileError(
                         "Title node should have 1 or 2 text nodes but it"
                         f"has {len(node.text_nodes)}. Line "
-                        f"{node.token.line_number}") 
+                        f"{node.token.line_number}")
             elif node.node_type == 'actionbar':
                 # Doesn't need to repeat that often (0.5s is enough)
                 loop_time = seconds_to_halfticks(0.5)
@@ -539,7 +539,8 @@ class AnimationTimeline:
                 AnimationTimeline._get_tp_suffixes_crds_facing_crds(
                     frames_stack, rotation_suffixes, spline_fit_degree)
             elif isinstance(c.coordinates, CoordinatesFacingEntity):
-                raise NotImplementedError()
+                AnimationTimeline._get_tp_suffixes_crds_facing_entity(
+                    frames_stack, rotation_suffixes)
             else:
                 raise ValueError()  # Should never happen
         # Get the start part of the command (the position) and combine it
@@ -603,9 +604,7 @@ class AnimationTimeline:
         for frame, y, x in zip(frames, ys, xs):
             output_value = f"{y:.2f} {x:.2f}"
             ouptut[int(frame)] = output_value
-        # Repeat the last frame until the next frame
-        for frame in range(last_frame, next_frame):
-            ouptut[int(frame)] = output_value
+        ouptut[last_frame] = output_value
 
     @staticmethod
     def _get_tp_suffixes_crds_facing_crds(
@@ -646,8 +645,34 @@ class AnimationTimeline:
             output_value = f"facing {x:.2f} {y:.2f} {z:.2f}"
             ouptut[int(frame)] = output_value
         # Repeat the last frame until the next frame
-        for frame in range(last_frame, next_frame):
-            ouptut[int(frame)] = output_value
+        ouptut[last_frame] = output_value
+
+    @staticmethod
+    def _get_tp_suffixes_crds_facing_entity(
+            frames_stack: deque[tuple[int, CoordinatesNode]], ouptut: dict[int, str]) -> None:
+        '''
+        Used by from_coordinates_list.
+
+        Gets suffixes of the /tp command for 'facing coordinates tp' nodes and
+        adds them to the 'output' dictionary. The 'facing coordinates tp'
+        command is the command that follows pattern
+        '/tp {x} {y} {z} {fx} {fy} {fz}'. This function takes care of the
+        'fx'm 'fy' and 'fz' part.
+        '''
+        first_frame, c = frames_stack[0]
+        if not isinstance(c.coordinates, CoordinatesFacingEntity):
+            raise ValueError(
+                "Invalid frame type has been passed to the "
+                "_get_tp_suffixes_crds_facing_entity this is a bug, please "
+                "submit an issue on the project repository.")
+        facing_target = c.coordinates.facing_target
+        next_frame, c = frames_stack.popleft()
+        # Repeat the last frame until the next frame
+        for frame in range(first_frame, next_frame):
+            ouptut[int(frame)] = facing_target
+        ouptut[next_frame] = facing_target
+
+
 
 @dataclass
 class AnimationControllerTimeline:
@@ -686,7 +711,7 @@ class AnimationControllerTimeline:
                     if len(timeline_deque) <= 0:
                         break
                     node = timeline_deque[0]
-                    
+
                 animation_timeline = AnimationTimeline.from_message_node_list(
                     config_provider, message_nodes, rp_path, run_once_counter)
                 events.append((animation_timeline,))

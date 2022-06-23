@@ -291,7 +291,6 @@ class ConfigProvider:
             sound_path = Path(sound)
         return Path("sounds") / sound_path
 
-
 @dataclass
 class TimelineEventAction:
     '''
@@ -666,19 +665,18 @@ class AnimationTimeline:
         'fx'm 'fy' and 'fz' part.
         '''
         first_frame, c = frames_stack[0]
+        frames_stack.popleft()
         if not isinstance(c.coordinates, CoordinatesFacingEntity):
             raise ValueError(
                 "Invalid frame type has been passed to the "
                 "_get_tp_suffixes_crds_facing_entity this is a bug, please "
                 "submit an issue on the project repository.")
         facing_target = c.coordinates.facing_target
-        next_frame, c = frames_stack.popleft()
+        next_frame, c = frames_stack[0]
         # Repeat the last frame until the next frame
         for frame in range(first_frame, next_frame):
             ouptut[int(frame)] = facing_target
         ouptut[next_frame] = facing_target
-
-
 
 @dataclass
 class AnimationControllerTimeline:

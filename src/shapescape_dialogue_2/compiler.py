@@ -675,8 +675,8 @@ class AnimationTimeline:
         next_frame, c = frames_stack[0]
         # Repeat the last frame until the next frame
         for frame in range(first_frame, next_frame):
-            ouptut[int(frame)] = facing_target
-        ouptut[next_frame] = facing_target
+            ouptut[int(frame)] = f"facing {facing_target}"
+        ouptut[next_frame] = f"facing {facing_target}"
 
 @dataclass
 class AnimationControllerTimeline:

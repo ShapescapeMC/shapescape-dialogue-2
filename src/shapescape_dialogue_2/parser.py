@@ -49,6 +49,7 @@ class TokenType(Enum):
     SETTINGS = auto()
     PROFILES = auto()
     TIMELINE = auto()
+    ACTOR_PATH = auto()
     BLANK = auto()
     SCHEDULE = auto()
     ON_EXTI = auto()
@@ -84,6 +85,8 @@ class TokenType(Enum):
             return '"settings:"'
         if self == TokenType.TIMELINE:
             return '"timeline:"'
+        if self == TokenType.ACTOR_PATH:
+            return "actor_path:"
         if self == TokenType.BLANK:
             return '"blank:"'
         if self == TokenType.SCHEDULE:
@@ -295,6 +298,7 @@ TOKENIZER = re.Scanner([  # type: ignore
     (r'settings:', lambda s, t: (TokenType.SETTINGS, t)),
     (r'profiles:', lambda s, t: (TokenType.PROFILES, t)),
     (r'timeline:', lambda s, t: (TokenType.TIMELINE, t)),
+    (r'actor_path:', lambda s, t: (TokenType.ACTOR_PATH, t)),
     (r'blank:', lambda s, t: (TokenType.BLANK, t)),
     (r'schedule:', lambda s, t: (TokenType.SCHEDULE, t)),
     (r'on_exti:', lambda s, t: (TokenType.ON_EXTI, t)),
@@ -812,8 +816,9 @@ class DialogueOptionNode:
 class CameraNode:
     coordinates: list[CoordinatesNode]
     settings: SettingsList
-    token: Token
+    actor_paths: list[ActorPathNode]
     timeline: Optional[TimelineNode]
+    token: Token
 
     @staticmethod
     def from_token_stack(tokens: deque[Token]) -> CameraNode:
@@ -837,6 +842,31 @@ class CameraNode:
                 token, TokenType.INDENT)
         tokens.popleft()
         # Coordinates
+        coordinates = CameraNode.parse_coordinates_list(tokens)
+        token = tokens[0]
+        # Actor path
+        actor_paths: list[ActorPathNode] = []
+        while token.token_type is TokenType.ACTOR_PATH:
+            actor_paths.append(ActorPathNode.from_token_stack(tokens))
+            token = tokens[0]
+        # Timeline
+        timeline: Optional[TimelineNode] = None
+        if token.token_type is TokenType.TIMELINE:
+            timeline = TimelineNode.from_token_stack(tokens)
+        elif token.token_type == TokenType.DEDENT:
+            tokens.popleft()
+        else:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.TIMELINE, TokenType.DEDENT)
+        return CameraNode(
+            coordinates, settings, actor_paths, timeline, root_token)
+
+    @staticmethod
+    def parse_coordinates_list(tokens: deque[Token]) -> list[CoordinatesNode]:
+        '''
+        Parses a code block with list of coordinates and returns a list.
+        '''
+        # Coordinates
         coordinates = []
         token = tokens[0]
         if token.token_type not in (
@@ -853,16 +883,46 @@ class CameraNode:
                 TokenType.COORDINATES_FACING_ENTITY):
             coordinates.append(CoordinatesNode.from_token_stack(tokens))
             token = tokens[0]
-        # Timeline
-        timeline: Optional[TimelineNode] = None
-        if token.token_type is TokenType.TIMELINE:
-            timeline = TimelineNode.from_token_stack(tokens)
-        elif token.token_type == TokenType.DEDENT:
-            tokens.popleft()
-        else:
+        return coordinates
+
+@dataclass
+class ActorPathNode:
+    coordinates: list[CoordinatesNode]
+    settings: SettingsList
+    token: Token
+
+    @staticmethod
+    def from_token_stack(tokens: deque[Token]) -> ActorPathNode:
+        token = tokens.popleft()
+        root_token = token
+        if token.token_type is not TokenType.ACTOR_PATH:
             raise ParseError.from_unexpected_token(
-                token, TokenType.TIMELINE, TokenType.DEDENT)
-        return CameraNode(coordinates, settings, root_token, timeline)
+                token, TokenType.ACTOR_PATH)
+        token = tokens[0]
+        # Settings
+        settings: SettingsList = []
+        if token.token_type is TokenType.SETTING:
+            settings = SettingsNode.parse_settings(
+                tokens,
+                accepted_settings={
+                    "time": float,
+                    "interpolation_mode": int,
+                    "tp_selector": str},
+                expected_settings={"tp_selector": str}
+            )
+            token = tokens[0]
+        # Expect indentation or finish parsing actor path node
+        if token.token_type is not TokenType.INDENT:
+            raise ParseError.from_unexpected_token(
+                token, TokenType.INDENT)
+        tokens.popleft()
+        # Coordinates
+        coordinates = CameraNode.parse_coordinates_list(tokens)
+        token = tokens[0]
+        # Expect DEDENT or EOF, don't pop EOF
+        if token.token_type is TokenType.DEDENT:
+            tokens.popleft()
+        return ActorPathNode(coordinates, settings, root_token)
 
 @dataclass
 class TimelineNode:

@@ -2,6 +2,15 @@ settings: wpm=120 title_max=15
 camera: interpolation_mode=1
     1617 14 1482 facing 1625 19 1472
     1617 14 1482 facing 1633 3 1478
+    actor_path: interpolation_mode=3 tp_selector=@e[type=zombie,c=1]
+        1617 14 1482 facing 1625 19 1472
+        1617 14 1482 facing 1633 3 1478
+    actor_path: interpolation_mode=3 tp_selector=@e[type=pig,c=1]
+        1617 14 1482 facing 1625 19 1472
+        1617 14 1482 facing 1633 3 1478
+    actor_path: interpolation_mode=3 tp_selector=@e[type=cat,c=1]
+        1617 14 1482 facing 1625 19 1472
+        1617 14 1482 facing 1633 3 1478
     timeline:
         blank: time=0.05
             run_once:

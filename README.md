@@ -16,10 +16,10 @@ in your system if you have Python properly installed. Simply use:
 pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2
 ```
 
-If you want to install specific version, for example `0.0.3`, you can pass
+If you want to install specific version, for example `0.5.0`, you can pass
 the tag name to pip like this:
 ```
-pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2@0.0.3
+pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2@0.5.0
 ```
 
 # ⭐ Usage
@@ -84,6 +84,9 @@ camera: interpolation_mode=1
     5 5 5 30 0
     5 10 5 0 0
     5 10 5 0 0
+    actor_path: interpolation_mode=3 tp_selector=@e[type=zombie,c=1]
+        1617 14 1482 facing 1625 19 1472
+        1617 14 1482 facing 1633 3 1478
     timeline:
         blank: time=1
             /scorebard players set @a force 0
@@ -155,8 +158,9 @@ A profile can contain the following nodes:
 ### camera
 The camera node is a special type of dialogue node, which controls the movement
 of the camera. It can only be used in the root timeline of the dialogue.
-Nesting camera nodes in other camera nodes is not allowed. Camera node has two
-parts - the list of coordinates and the timeline.
+Nesting camera nodes in other camera nodes is not allowed. Camera node has three
+parts - the list of coordinates, optional section fo actor paths and the
+timeline.
 
 The coordinates can be written in one of 3 formats:
 - `<x> <y> <z> <yaw> <pitch>` - for example `1 2 3 45 90`.
@@ -170,6 +174,12 @@ different formats in the same timeline is allowed but not recommended. While
 using the first format, it's important to know that the interpolation treats
 the rotations as normal coordinates. So interpolating between 350° and 0° does
 almost a full rotation.
+
+The actor paths are the subnodes of the "camera" node. There can be multiple
+actor paths in the same camera. The actor path contains a list of coordinates
+to animate different entity than the player. Actor path thakes the same
+settings asa camera (interpolation_mode and tp_selector) but the "tp_selector"
+is required.
 
 The `camera` can either use a `time` property which defines the
 duration of the camera movement, or have a list of message nodes in its

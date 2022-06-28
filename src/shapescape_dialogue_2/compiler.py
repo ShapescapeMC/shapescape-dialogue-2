@@ -775,10 +775,33 @@ class AnimationControllerTimeline:
                 camera_timeline = AnimationTimeline.from_coordinates_list(
                     node, time, combined_settings.get('tp_selector', '@a'),
                     spline_fit_degree=spline_fit_degree)
+                # Add actor timelines
+                actor_timelines: list[AnimationTimeline] = []
+                for actor_path in node.actor_paths:
+                    # Combined settings
+                    combined_settings = (
+                        config_provider.settings |
+                        SettingsNode.settings_list_to_dict(actor_path.settings))
+                    # spline_fit_degree
+                    try:
+                        actor_spline_fit_degree = int(
+                            camera_settings["interpolation_mode"])
+                    except KeyError:
+                        actor_spline_fit_degree = 3
+                    except ValueError:
+                        raise CompileError(
+                            "Unable to parse 'interpolation_mode' as an integer. "
+                            f"Line: {node.token.line_number}")
+                    actor_timeline = AnimationTimeline.from_coordinates_list(
+                        node, time, combined_settings['tp_selector'],
+                        spline_fit_degree=actor_spline_fit_degree)
+                    actor_timelines.append(actor_timeline)
+
                 if messages_timeline is not None:
-                    events.append((camera_timeline, messages_timeline))
+                    events.append(
+                        (camera_timeline, messages_timeline, *actor_timelines))
                 else:
-                    events.append((camera_timeline,))
+                    events.append((camera_timeline, *actor_timelines))
             else:
                 raise ValueError(f"Unknown node type: {node}")
         return AnimationControllerTimeline(events)

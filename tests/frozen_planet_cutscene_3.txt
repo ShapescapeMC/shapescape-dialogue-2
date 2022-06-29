@@ -1,0 +1,80 @@
+settings: wpm=120
+
+## The initial title (black screen)
+camera:
+    1235 76 348 69 30
+    timeline:
+        blank: time=2
+            /effect @a invisibility 99999 0 true
+            /title @a title shapescape:image_popup_0
+
+## Frozen forest
+camera:
+    1235 76 348 69 30
+    1162 90 377 69 17
+    timeline:
+        blank: time=1.0
+        actionbar:
+            >§3Circling the far North of our planet, lies a vast frozen land of snowcovered forests
+
+## Frozen tundra
+camera:
+    1506 59 649 -125 -3
+    1555 59 615 -125 -3
+    timeline:
+        actionbar:
+            >§3and open tundra that stretches all the way to the Arctic Ocean
+
+## Edge of Frozen Tundra and Forest ===> Frozen Forest
+camera: interpolation_mode=1
+    1542 64 936 -90 0
+    1542 92 936 100 10
+    timeline:
+        actionbar:
+            >§3On the tundra's southern fringes, winter conditions become more favorable for life.
+        actionbar:
+            >§3Here, an increase in sunlight has allowed a stunted forest to rise up.
+camera: time=0.1
+    1542 92 936 100 10
+
+
+## Frozen forest
+camera:
+    1134 60 840 72 7
+    1090 54 854 90 0
+    1045 54 862 90 10
+    timeline:
+        actionbar:
+            >§3One of the most remote tracks of frozen forest lies in the  far east of Siberia.
+        actionbar:
+            >§3Cut off from the rest of the world, it's the last stronghold of the world's rarest big cat.
+            /summon shapescape:leopard_actor ~ ~ ~ shapescape:look_behaviors
+            /tp @e[type=shapescape:leopard_actor,c=1] 1011 52 860
+
+## Leopard
+camera:
+    1014 54 864 facing 1012 52 861
+    timeline:
+        actionbar:
+            >§3The Amur Leopard.
+
+## Leopard walking
+camera: interpolation_mode=2
+    1014 54 864 facing 1012 52 861
+    1009 56 865 facing 1014 52 857
+    1009 56 865 facing 1026 53 847
+    actor_path: tp_selector=@e[type=shapescape:leopard_actor] interpolation_mode=1
+        1011 52 860 facing 1029 53 842
+        1021 52 851 facing 1029 53 842
+    timeline:
+        actionbar:
+            >§3Hunted to near extinction, this adult is only one of 120 left in the wild.
+        actionbar:
+            >§3He must patrol his 300 square kilometer territory to find enough to eat.
+
+## Final shot, don't move the camera for a few seconds
+camera: time=4
+    1009 56 865 facing 1026 53 847
+blank: time=0.1
+    /effect @a invisibility 0 0 true
+    /event entity @e[family=actor] shapescape:despawn

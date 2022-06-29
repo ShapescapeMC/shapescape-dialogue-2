@@ -857,7 +857,8 @@ class CameraNode:
             tokens.popleft()
         else:
             raise ParseError.from_unexpected_token(
-                token, TokenType.TIMELINE, TokenType.DEDENT)
+                token, TokenType.TIMELINE, TokenType.DEDENT,
+                TokenType.ACTOR_PATH)
         return CameraNode(
             coordinates, settings, actor_paths, timeline, root_token)
 

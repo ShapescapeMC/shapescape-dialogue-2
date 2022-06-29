@@ -22,7 +22,7 @@ from .parser import (CameraNode, CoordinatesFacingCoordinates,
                      CoordinatesFacingEntity, CoordinatesNode,
                      CoordinatesRotated, DialogueNode, MessageNode,
                      SettingsList, SettingsNode, ProfileNode, var_pattern,
-                     Token)
+                     ActorPathNode)
 
 class CompileError(Exception):
     '''
@@ -509,7 +509,7 @@ class AnimationTimeline:
 
     @staticmethod
     def from_coordinates_list(
-            camera_node: CameraNode,
+            camera_node: Union[CameraNode, ActorPathNode],
             time: int, tp_selector: str, spline_fit_degree: int=3) -> AnimationTimeline:
         '''
         Creates a AnimationTimeline from a CameraNode.
@@ -777,11 +777,12 @@ class AnimationControllerTimeline:
                     spline_fit_degree=spline_fit_degree)
                 # Add actor timelines
                 actor_timelines: list[AnimationTimeline] = []
-                for actor_path in node.actor_paths:
+                for actor_path_node in node.actor_paths:
                     # Combined settings
                     combined_settings = (
                         config_provider.settings |
-                        SettingsNode.settings_list_to_dict(actor_path.settings))
+                        SettingsNode.settings_list_to_dict(
+                            actor_path_node.settings))
                     # spline_fit_degree
                     try:
                         actor_spline_fit_degree = int(
@@ -793,7 +794,8 @@ class AnimationControllerTimeline:
                             "Unable to parse 'interpolation_mode' as an integer. "
                             f"Line: {node.token.line_number}")
                     actor_timeline = AnimationTimeline.from_coordinates_list(
-                        node, time, combined_settings['tp_selector'],
+                        actor_path_node, time,
+                        combined_settings['tp_selector'],
                         spline_fit_degree=actor_spline_fit_degree)
                     actor_timelines.append(actor_timeline)
 

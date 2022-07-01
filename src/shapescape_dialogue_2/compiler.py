@@ -318,28 +318,32 @@ class TimelineEventAction:
             translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'tellraw @a '
-                f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
+                f'{{"rawtext":[{{"translate":"{translation_code}",'
+                f'"with":["\\n"]}}]}}')
         elif self.action_type == "title":
             resolved_value = config_provider.insert_variables(
                 self.value, self.line_number)
             translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a title '
-                f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
+                f'{{"rawtext":[{{"translate":"{translation_code}",'
+                f'"with":["\\n"]}}]}}')
         elif self.action_type == "actionbar":
             resolved_value = config_provider.insert_variables(
                 self.value, self.line_number)
             translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a actionbar '
-                f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
+                f'{{"rawtext":[{{"translate":"{translation_code}",'
+                f'"with":["\\n"]}}]}}')
         elif self.action_type == "subtitle":
             resolved_value = config_provider.insert_variables(
                 self.value, self.line_number)
             translation_code = tc_provider.get_translation_code(resolved_value)
             return  (
                 'titleraw @a subtitle '
-                f'{{"rawtext":[{{"translate":"{translation_code}"}}]}}')
+                f'{{"rawtext":[{{"translate":"{translation_code}",'
+                f'"with":["\\n"]}}]}}')
         elif self.action_type == "command":
             return self.value
         elif self.action_type == "playsound":

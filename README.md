@@ -242,6 +242,21 @@ The main part of the message node is the message. Messages start with
 `>`. Message nodes can also run commands. Commands in dialogues must use the
 `/` prefix. Messages must be defined above the commands.
 
+All Raw JSON text produced by the script uses structure:
+```
+{"rawtext":[{"translate":"AUTOMATICALLY_ASSIGNED_VALUE","with":["\n"]}]}
+```
+where `AUTOMATICALLY_ASSIGNED_VALUE` is a translation key assigned by the script.
+Note that the `"with":["\n"]` is added so you can use the newline character in
+your text (in a same way as in usual Minecraft addon creation). E.g.
+`>Hello%1World!` would be displayed in game as:
+```
+Hello
+World!
+```
+
+
+
 #### The subnodes of message nodes
 
 Message nodes use subnodes for commands that have some additional conditions

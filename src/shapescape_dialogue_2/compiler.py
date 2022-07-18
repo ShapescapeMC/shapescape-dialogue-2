@@ -534,9 +534,7 @@ class AnimationTimeline:
             add_event_action(time, *actions)
             time = time + duration
         # Max time is either equal to time or something scheduled for later
-        max_time = time
-        if len(events) > 0:
-            max_time = max(events.keys())
+        max_time = max([time] + list(events.keys()))
         return AnimationTimeline(events, max_time)
 
     @staticmethod

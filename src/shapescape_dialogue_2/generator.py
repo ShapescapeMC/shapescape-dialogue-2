@@ -296,7 +296,7 @@ class BpaGenerator:
         # Create animation content
         data: dict[str, Any] = {
             "loop": False,
-            "animation_length": halfticks_to_seconds(timeline.time) + 0.05,
+            "animation_length": halfticks_to_seconds(timeline.time) + 0.1,
             "timeline": {}
         }
         sorted_event_keys = sorted(timeline.events.keys())

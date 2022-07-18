@@ -269,7 +269,9 @@ for being executed:
     the state of the game changes.
 - `schedule` - schedule lets you run commands with a delay. The schedule
     label requires `time` property to be defined. The timer of the delay starts
-    when the message is displayed.
+    when the message is displayed. Schedule also supports negative values. In
+    this case the timer counts backwards, starting from the end of the message.
+    Adding scheduled commands that evaluate to values below 0 is not allowed.
 - `on_exit` - on exit is a convenient way to put a command after the time of
     the message node. It's the same as putting it in the next message node.
 - `loop` - loop repeats the message while the section of the message node is

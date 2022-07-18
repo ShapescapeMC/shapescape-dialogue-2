@@ -12,19 +12,9 @@ from typing import Any, Optional, Union
 
 from .compiler import (AnimationControllerTimeline, AnimationTimeline,
                        ConfigProvider, SoundCodeProvider, TimelineEvent,
-                       TranslationCodeProvider)
+                       TranslationCodeProvider, halfticks_to_seconds)
 from .parser import ProfileNode, RootAstNode
 
-
-def halfticks_to_seconds(ticks: int) -> float:
-    '''
-    Converts half-ticks to seconds.
-
-    The generator uses half-ticks instead of ticks to make camera movement
-    in animations move more smoothly in case of skipping frames. 1 half-tick
-    is a half of a tick.
-    '''
-    return ticks / 40.0
 
 class GeneratorError(Exception):
     pass
@@ -306,7 +296,7 @@ class BpaGenerator:
         # Create animation content
         data: dict[str, Any] = {
             "loop": False,
-            "animation_length": halfticks_to_seconds(timeline.time + 1),
+            "animation_length": halfticks_to_seconds(timeline.time) + 0.05,
             "timeline": {}
         }
         sorted_event_keys = sorted(timeline.events.keys())
@@ -429,6 +419,11 @@ class BpeGenerator:
                     }
                 },
                 "components": {
+                    "minecraft:type_family": {
+                        "family": [
+                            "cutscene"
+                        ]
+                    },
                     "minecraft:pushable": {
                         "is_pushable": False,
                         "is_pushable_by_piston": False

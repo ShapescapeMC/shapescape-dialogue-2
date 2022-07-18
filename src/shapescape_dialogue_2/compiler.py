@@ -403,6 +403,11 @@ class AnimationTimeline:
                 add_event_action(time, optional_sound_node)
             actions: list[TimelineEventAction]
             if node.node_type == 'tell':
+                if len(node.text_nodes) < 1:
+                    raise CompileError(
+                        "Tell node should have at least one text but it "
+                        f"has zero. Line "
+                        f"{node.token.line_number}")
                 actions = [  # The messages
                     TimelineEventAction(
                         'tell', text_node.text, text_node.token.line_number)
@@ -490,7 +495,26 @@ class AnimationTimeline:
                         text_node.token.line_number)
                     for text_node in schedule_node.command_nodes
                 ]
-                add_event_action(time + schedule_time, *scheduled_actions)
+                scheduled_time = (
+                    time + schedule_time
+                    if schedule_time >= 0 else
+                    time + duration + schedule_time)  # Count from the end
+                if scheduled_time < 0:
+                    raise CompileError(
+                        "Schedule time is evaluated to a value below 0. "
+                        "This means that you expect the command to be "
+                        "executed before the start of the animation, which "
+                        "is not possible.\n"
+                        "\tNegative values for schedule are allowed as long as "
+                        "they don't result in a time before 0.\n"
+                        "\tYou can fix this issue by adding an empty 'blank' "
+                        "node at the start of the dialogue, with a 'time' "
+                        "value greater than "
+                        f"{halfticks_to_seconds(-scheduled_time):g} seconds.\n"
+                        f"\tLine: {schedule_node.token.line_number}"
+                    )
+                    
+                add_event_action(scheduled_time, *scheduled_actions)
             for loop_node in node.loop_nodes:
                 loop_time = seconds_to_halfticks(  # This should be safe (parser checks that)
                     ConfigProvider.parse_settings(
@@ -509,7 +533,11 @@ class AnimationTimeline:
                     loop_time_sum += loop_time
             add_event_action(time, *actions)
             time = time + duration
-        return AnimationTimeline(events, time)
+        # Max time is either equal to time or something scheduled for later
+        max_time = time
+        if len(events) > 0:
+            max_time = max(events.keys())
+        return AnimationTimeline(events, max_time)
 
     @staticmethod
     def from_coordinates_list(
@@ -823,6 +851,15 @@ def seconds_to_halfticks(duration: Union[float, str, int]) -> int:
     '''
     return int(math.ceil(float(duration) * 40))
 
+def halfticks_to_seconds(ticks: int) -> float:
+    '''
+    Converts half-ticks to seconds.
+
+    The generator uses half-ticks instead of ticks to make camera movement
+    in animations move more smoothly in case of skipping frames. 1 half-tick
+    is a half of a tick.
+    '''
+    return ticks / 40.0
 
 def b_spline_magic(
         y: list[float], x_start: float, x_end: float,

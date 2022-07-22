@@ -552,8 +552,12 @@ def generate(tree: RootAstNode, context: Context) -> None:
     context.sc_provider.inspect_sound_paths(context.rp_path)
     for k, v in context.sc_provider.walk_names():
         sounds_data[k] = {
-            "category": "music",
-            "sounds": [v]
+            "sounds": [
+                {
+                    "name": v,
+                    "is3D": False,
+                }
+            ]
         }
     sounds_definitions_writer = SoundDefinitionsJsonWriter(sounds_data)
 

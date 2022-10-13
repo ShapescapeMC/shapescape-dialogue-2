@@ -556,6 +556,8 @@ def generate(tree: RootAstNode, context: Context) -> None:
                 {
                     "name": v,
                     "is3D": False,
+                    "stream" : True,
+                    "load_on_low_memory": True
                 }
             ]
         }

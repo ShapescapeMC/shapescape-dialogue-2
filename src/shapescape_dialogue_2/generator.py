@@ -393,11 +393,19 @@ class BpeGenerator:
     def add_writer(
             self, entity_name: str, context: Context,
             bpa_generator: BpaGenerator,
-            bpac_generator: BpacGenerator) -> None:
+            bpac_generator: BpacGenerator,
+            cg_description: Optional[str] = None) -> None:
         '''
         Adds an entity writer to the list. This function uses the data
         from animation and animation controller generators. To add the
         animations to the entity.
+
+        :param entity_name: The name of the entity
+        :param context: ...
+        :param bpa_generator: ...
+        :param bpac_generator: ...
+        :param cg_description: The description used for the content guide
+            (optional)
         ''' 
         # Generate file content
         data: dict[str, Any] = {
@@ -481,6 +489,11 @@ class BpeGenerator:
                     ]
                 }
             }
+        # Optional description property for the content guide generator
+        if cg_description is not None:
+            description['description'] = cg_description
+            description['category'] = 'non_player_facing_utility'
+            description['location'] = []
 
         # Add the writer
         writer_path = Path(f'{entity_name}.bpe.json')
@@ -518,6 +531,10 @@ def generate(tree: RootAstNode, context: Context) -> None:
     bpac_generator =BpacGenerator()
     bpa_generator = BpaGenerator()
     bp_entity_generator = BpeGenerator()
+    entity_description: Optional[str] = None
+    for setting in tree.settings.settings:
+        if setting.name == 'description':
+            entity_description = setting.value
 
     # The writers (simple files don't need generators)
     sounds_definitions_writer: Optional[SoundDefinitionsJsonWriter] = None
@@ -570,7 +587,8 @@ def generate(tree: RootAstNode, context: Context) -> None:
 
     # Generate the entity
     bp_entity_generator.add_writer(
-        context.subpath, context, bpa_generator, bpac_generator)
+        context.subpath, context, bpa_generator, bpac_generator,
+        cg_description=entity_description)
     
     # Write everything to the filesystem
     for writer in mcfunction_generator.writers:

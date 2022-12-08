@@ -460,7 +460,7 @@ class SettingsNode:
             tokens,
             accepted_settings={
                 "wpm": float, "cpm": float, "title_max": int,
-                "tp_selector": str}
+                "tp_selector": str, 'description': str}
         )
         return SettingsNode(settings, root_token)
 

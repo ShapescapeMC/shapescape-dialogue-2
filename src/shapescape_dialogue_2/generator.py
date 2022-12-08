@@ -493,7 +493,7 @@ class BpeGenerator:
         if cg_description is not None:
             description['description'] = cg_description
             description['category'] = 'non_player_facing_utility'
-            description['location'] = []
+            description['locations'] = []
 
         # Add the writer
         writer_path = Path(f'{entity_name}.bpe.json')

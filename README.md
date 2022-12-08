@@ -123,6 +123,10 @@ Using them is optional. The following settings are supported:
 - `title_max: int` - **NOT IMPLEMENTED** - maximum length of the title.
 - `tp_selector: string` - the selector used in the `/tp` commands of the camera
    nodes. By default it uses `@a`.
+- `description: string` - a description field for the entity for this dialogue for
+   [content guide generator](https://github.com/ShapescapeMC/content-guide-generator).
+   Adding this property additionally adds other properties that the content guide
+   generator expects: `"locations": [], "category": "non_player_facing_utility"` 
 
 ## Profiles
 The `profiles` node defines profiles. Each profile is used to generate an

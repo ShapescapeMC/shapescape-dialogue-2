@@ -236,7 +236,7 @@ On exit is a convenient way to put a command after the time of the message node.
 ##### `loop`
 Loop repeats the message while playing its section of the message node. It uses the `time` property to determine the duration of the loop.
 
-> _Developer Note_
+> **Note**
 > 
 >Internally, the `schedule`, `loop` and `on_exit` commands are just inserted into the timeline of the Minecraft BP animation. The `run_once` is handled by generating a tag which marks the commands as executed.
 

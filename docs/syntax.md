@@ -207,18 +207,18 @@ This node displays the text with the `titleraw <tp_selector> title` command for 
 #### `Actionbar:`
 This node displays the text with the `titleraw <tp_selector> actionbar` command. It can't contain more than one line.
 #### `Blank:`
-This node is not used for displaying text. It is however used for executing commands, loops ect. The blank nodes do not allow for `wmp` and `cpm` properties.
+This node is not used for displaying text. It is however used for executing commands, loops ect. The blank nodes do not allow for `wpm` and `cpm` properties.
 
 #### Message node properties
 Message nodes can use one following properties to define their length.
 
-`wpm:` `float`\
+`wpm: float`\
 Defines the length of this message by a set amount of words per minute. This property has a higher priority than the `wpm` defined in the settings.\
-`cpm:` `float`\
-Defines the length of this message by a set amount of characters per minute. Has higher priority than the `cpm` defined in the settings..\
-`time:` `float`\
+`cpm: float`\
+Defines the length of this message by a set amount of characters per minute. Has higher priority than the `cpm` defined in the settings.\
+`time: float`\
 Defines the length of this message by a set amount of time. \
-`sound:` `string`\
+`sound: string`\
 Defines the length of this message by the length of the provided sound file. 
 
 Note that using a reference to a sound that doesn't exist is not an error, but it will print a warning. Such references are useful if you don't have a sound and need to generate a placeholder dialogue.
@@ -297,6 +297,7 @@ The `camera` node also accepts the `interpolation_mode` property, which defines 
 
 The default value is 3. The interpolation mode value must be less than the number of points to be interpolated. If there are not enough points, the interpolation mode is automatically reduced to the lowest possible value.
 
+#### TP Selector
 The camera's `tp_selector` property sets the target selector used for the `/tp` command. By default, it's set to @`a`.
 
 #### Actor Paths

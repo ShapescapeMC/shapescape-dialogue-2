@@ -1,4 +1,4 @@
-settings: wpm=120 title_max=15
+settings: wpm=120
 profiles:
     male:
         sounds:

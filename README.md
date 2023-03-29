@@ -120,7 +120,6 @@ Using them is optional. The following settings are supported:
     dialog duration.
 - `cpm: float` - The default character-per-minute value used to determine the
     dialog duration. If `wpm` is defined, `cpm` is ignored.
-- `title_max: int` - **NOT IMPLEMENTED** - maximum length of the title.
 - `tp_selector: string` - the selector used in the `/tp` commands of the camera
    nodes. By default it uses `@a`.
 - `description: string` - a description field for the entity for this dialogue for

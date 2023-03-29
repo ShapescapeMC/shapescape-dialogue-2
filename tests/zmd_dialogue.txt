@@ -1,4 +1,4 @@
-settings: wpm=30 title_max=15
+settings: wpm=30
 ## No sound profiles in this project.
 
 

@@ -1,4 +1,4 @@
-settings: wpm=120 title_max=15
+settings: wpm=120
 camera: interpolation_mode=1
     1617 14 1482 facing 1625 19 1472
     1617 14 1482 facing 1633 3 1478

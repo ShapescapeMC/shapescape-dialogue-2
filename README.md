@@ -1,7 +1,7 @@
 # 📝 Description
 `shapescape-dialogue-2` is a Python package for generating dialogue and camera
 sequences for Minecraft. It's the core of the
-[shapescape_dialogue](https://github.com/ShapescapeMC/regolith-filters/tree/master/shapescape_dialogue)
+[shapescape_dialogue](https://github.com/Shapescape-Software/shapescape_dialogue)
 Regolith filter but it can also be used as a standalone tool (not recommended).
 
 # 💿 Installation
@@ -13,19 +13,19 @@ Regolith filter but it can also be used as a standalone tool (not recommended).
 You can install the package with `pip` command which should be available
 in your system if you have Python properly installed. Simply use:
 ```
-pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2
+pip install git+https://github.com/Shapescape-Software/shapescape-dialogue-module
 ```
 
 If you want to install specific version, for example `0.5.0`, you can pass
 the tag name to pip like this:
 ```
-pip install git+https://github.com/ShapescapeMC/shapescape-dialogue-2@0.5.0
+pip install git+https://github.com/Shapescape-Software/shapescape-dialogue-module@0.5.0
 ```
 
 # ⭐ Usage
 In most cases you should use this tool with Regolith. Details related
 to Regolith are explained on the
-[filter page](https://github.com/ShapescapeMC/regolith-filters/tree/master/shapescape_dialogue)
+[filter page](https://github.com/Shapescape-Software/shapescape_dialogue)
 and in the
 [Regolith documentation](https://bedrock-oss.github.io/regolith/). The filter
 runs the main script from this package, which can also be used as a standalone
@@ -123,7 +123,7 @@ Using them is optional. The following settings are supported:
 - `tp_selector: string` - the selector used in the `/tp` commands of the camera
    nodes. By default it uses `@a`.
 - `description: string` - a description field for the entity for this dialogue for
-   [content guide generator](https://github.com/ShapescapeMC/content-guide-generator).
+   [content guide generator](https://github.com/Shapescape-Software/content_guide_generator).
    Adding this property additionally adds other properties that the content guide
    generator expects: `"locations": [], "category": "non_player_facing_utility"` 
 

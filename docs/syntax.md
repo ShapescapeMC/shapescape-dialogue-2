@@ -33,6 +33,7 @@ In this article you can read about:
   - [Camera](#camera)
     - [Coordinates](#coordinates)
     - [Interpolation Mode](#interpolation-mode)
+    - [TP Selector](#tp-selector)
     - [Actor Paths](#actor-paths)
 - [Example File](#example-file)
 <!-- doctree end -->

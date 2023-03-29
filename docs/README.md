@@ -8,7 +8,6 @@ Table of contents:
 - [Writing the Documentation](/docs/writing_the_documentation.md)
 
 In this article you can read about:
-- [Using the Documentation](#using-the-documentation)
 - [How to use the documentation](#how-to-use-the-documentation)
 <!-- doctree end -->
 # About the documentation

@@ -1,17 +1,17 @@
 <!-- doctree start -->
 Table of contents:
-- [# Writing the Documentation](/docs/writing_the_documentation.md)
 - [About the documentation](/docs/README.md)
 - [Installation as Regolith Filter](/docs/installation.md)
 - [Syntax of the dialogue files](/docs/syntax.md)
-- [Usage](/docs/usage_as_module.md)
-- [Usage](/docs/usage_with_regolith_filter.md)
+- [Usage as module](/docs/usage_as_module.md)
+- [Usage with regolith filter](/docs/usage_with_regolith_filter.md)
+- [Writing the Documentation](/docs/writing_the_documentation.md)
 
 In this article you can read about:
 - [Run the filter](#run-the-filter)
 - [Start dialogues in-game](#start-dialogues-in-game)
 <!-- doctree end -->
-# Usage
+# Usage with regolith filter
 
 ## Run the filter
 This regolith filter is designed to generate Minecraft entities that run a sequence of commands, dialogues, and camera movements based on a custom syntax. It can be used to create cutscenes or dialogue sequences within Minecraft. By using this module, users can create more immersive and engaging experiences for players within the game.

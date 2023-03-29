@@ -1,11 +1,11 @@
 <!-- doctree start -->
 Table of contents:
-- [# Writing the Documentation](/docs/writing_the_documentation.md)
 - [About the documentation](/docs/README.md)
 - [Installation as Regolith Filter](/docs/installation.md)
 - [Syntax of the dialogue files](/docs/syntax.md)
-- [Usage](/docs/usage_as_module.md)
-- [Usage](/docs/usage_with_regolith_filter.md)
+- [Usage as module](/docs/usage_as_module.md)
+- [Usage with regolith filter](/docs/usage_with_regolith_filter.md)
+- [Writing the Documentation](/docs/writing_the_documentation.md)
 
 In this article you can read about:
 - [Using the Documentation](#using-the-documentation)

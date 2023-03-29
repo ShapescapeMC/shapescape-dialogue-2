@@ -46,7 +46,8 @@ Dialogue files use a custom syntax similar to YAML. A dialogue file can be divid
 - [Profiles](#profiles) (optional) - Profiles are used to create alternate versions of dialogues that differ in sounds and some text.
 - [Dialogue Definition](#dialogue-definition) - The Dialogue Definition consists of a list of nodes used to create the dialogue.
 
-Please note that this filter strictly looks for indentation in your code. While the tool can adjust to different types of indentation, it may break if the indentation is not consistent throughout your code.
+> **Note**
+> Please note that this filter strictly looks for indentation in your code. While the tool can adjust to different types of indentation, it may break if the indentation is not consistent throughout your code.
 
 ## Settings
 Settings define the default values of some properties used later in the code. Their use is optional. 
@@ -222,7 +223,8 @@ Defines the length of this message by a set amount of time. \
 `sound: string`\
 Defines the length of this message by the length of the provided sound file. 
 
-Note that using a reference to a sound that doesn't exist is not an error, but it will print a warning. Such references are useful if you don't have a sound and need to generate a placeholder dialogue.
+> **Note**
+> that using a reference to a sound that doesn't exist is not an error, but it will print a warning. Such references are useful if you don't have a sound and need to generate a placeholder dialogue.
 
 #### The sub-nodes of message nodes
 
@@ -287,7 +289,10 @@ The coordinates can be written in one of three formats: Simple, Facing to Coordi
 - The Facing to Coordinates format is written as `<x> <y> <z> facing <x1> <y1> <z1>` and an example would be `1 2 3 facing 4 5 6`.
 - The Facing to Selector format is written as `<x> <y> <z> facing <selector>` and an example would be `1 2 3 facing @p`.
 
-The coordinate formats match the format used in Minecraft's `/tp` command. It's recommended to use only one format for the entire camera animation, as this allows the script to interpolate smoothly between frames. Mixing different formats in the same timeline is allowed, but not recommended. When using the Simple format, it's important to note that the interpolation treats the rotations as normal coordinates. Therefore, interpolating between 350° and 0° is almost a full rotation.
+The coordinate formats match the format used in Minecraft's `/tp` command. It's recommended to use only one format for the entire camera animation, as this allows the script to interpolate smoothly between frames. Mixing different formats in the same timeline is allowed, but not recommended. 
+
+> **Note**
+> When using the Simple format, it's important to note that the interpolation treats the rotations as normal coordinates. Therefore, interpolating between 350° and 0° is almost a full rotation.
 
 #### Interpolation Mode
 The `camera` node also accepts the `interpolation_mode` property, which defines the type of interpolation used for camera movement. The argument takes an integer value from 0 to 3, which refers to the order of the spline interpolation:

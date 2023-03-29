@@ -18,6 +18,23 @@ In this article you can read about:
   - [`sounds:`](#sounds)
   - [`variables:`](#variables)
 - [Dialogue Definition](#dialogue-definition)
+  - [Comments](#comments)
+  - [Message nodes](#message-nodes)
+    - [`Tell:`](#tell)
+    - [`Title:`](#title)
+    - [`Actionbar:`](#actionbar)
+    - [`Blank:`](#blank)
+    - [Message node properties](#message-node-properties)
+    - [The sub-nodes of message nodes](#the-sub-nodes-of-message-nodes)
+      - [`run_once`](#run_once)
+      - [`schedule`](#schedule)
+      - [`on_exit`](#on_exit)
+      - [`loop`](#loop)
+  - [Camera](#camera)
+    - [Coordinates](#coordinates)
+    - [Interpolation Mode](#interpolation-mode)
+    - [Actor Paths](#actor-paths)
+- [Example File](#example-file)
 <!-- doctree end -->
 # Syntax of the dialogue files
 

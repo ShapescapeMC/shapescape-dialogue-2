@@ -12,7 +12,6 @@ In this article you can read about:
 - [How to use the documentation](#how-to-use-the-documentation)
 <!-- doctree end -->
 # About the documentation
-## Using the Documentation
 
 Welcome to the documentation for the Shapescape Dialogue Filter! This guide is designed to help you use the filter effectively and efficiently.
 

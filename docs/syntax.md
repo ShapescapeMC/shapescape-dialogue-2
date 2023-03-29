@@ -51,7 +51,7 @@ Please note that this filter strictly looks for indentation in your code. While 
 Settings define the default values of some properties used later in the code. Their use is optional. 
 
 ```
-settings: wpm=120 tp_selector=@a[tag=!dev] description="The is a camera entity" 
+settings: wpm=120 tp_selector=@a[tag=!dev] description="This is a camera entity!"
 ```
 The following settings are supported:
 ### `wpm`
@@ -130,7 +130,7 @@ camera: interpolation_mode=1
     5 5 5 30 0
     5 10 5 0 0
     5 10 5 0 0
-    actor_path: interpolation_mode=3 tp_selector=@e[type=zombie,c=1]
+    actor_path: interpolation_mode=3 tp_selector=@e[type=shapescape:grevious,c=1]
         1617 14 1482 facing 1625 19 1472
         1617 14 1482 facing 1633 3 1478
     timeline:
@@ -182,8 +182,6 @@ actionbar:
 blank: time=5
 ```
 
-The main part of the message node is the message. Messages start with `>`. Message nodes can also execute commands. Commands in dialogs must use the `/` prefix. Messages must be defined above commands.
-
 The main part of the message node is the message, which starts with `>`. Message nodes can also execute commands, which must use the `/` prefix. Messages must be defined above commands."
 
 Message nodes can be nested inside other nodes such as a [camera](#camera) timeline.
@@ -192,7 +190,6 @@ All Raw JSON text produced by the script uses the structure:
 ```
 {"rawtext":[{"translate":"AUTOMATICALLY_ASSIGNED_VALUE","with":["\n"]}]}
 ```
-where `AUTOMATICALLY_ASSIGNED_VALUE` is a translation key assigned by the script. Note that the `"with":["\n"]` is added so that you can use the newline character in your text (in the same way as you would when creating a normal Minecraft addon). For example, `>Hello%1World!` would be displayed in-game as:
 
 where `AUTOMATICALLY_ASSIGNED_VALUE` is a translation key assigned by the script. Note that the `"with":["\n"]` is added so that you can use the newline character in your text (in the same way as you would when creating a normal Minecraft addon).
 
@@ -251,7 +248,7 @@ camera: interpolation_mode=1
     5 5 5 30 0
     5 10 5 0 0
     5 10 5 0 0
-    actor_path: interpolation_mode=3 tp_selector=@e[type=zombie,c=1]
+    actor_path: interpolation_mode=3 tp_selector=@e[shapescape:grevious,c=1]
         1617 14 1482 facing 1625 19 1472
         1617 14 1482 facing 1633 3 1478
     timeline:
@@ -307,7 +304,7 @@ The actor paths are subnodes of the camera node, and multiple actor paths can ex
 
 ## Example File
 ```
-settings: wpm=120 tp_selector=@a[tag=!dev] description="The is a camera entity
+settings: wpm=120 tp_selector=@a[tag=!dev] description="This is a camera entity!"
 profiles:
     male:
         sounds:
@@ -342,12 +339,12 @@ camera: interpolation_mode=1
     5 10 5 0 0
     5 10 5 0 0
     
-    ## This is a comment that could mention something explain something about the the actor_path
+    ## This is a comment that could mention something about the the actor_path
     actor_path: interpolation_mode=3 tp_selector=@e[type=grevious,c=1]
         1617 14 1482 facing 1625 19 1472
         1617 14 1482 facing 1633 3 1478
     timeline:
-        blank: 
+        blank: time=5
             loop: time=0.5
                 /time add 100
         blank: time=10

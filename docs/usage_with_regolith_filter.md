@@ -25,4 +25,4 @@ Then you just need to run regolith and all files relevant to the filter will be 
 ```
 
 ## Start dialogues in-game
-Since the dialogue entity executes the logic behind the camera movements and dialogue, it is important to ensure that the entity remains within the entity render distance. Ideally, the entity should be summoned within a ticking area to ensure that it continues to function properly.
+Since the dialogue entity executes the logic behind the camera movements and dialogue, it is important to ensure that the entity remains within loaded chunks. Ideally, the entity should be summoned within a ticking area to ensure that it continues to function properly.

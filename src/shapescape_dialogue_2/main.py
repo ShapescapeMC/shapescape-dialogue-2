@@ -9,10 +9,10 @@ from .parser import ParseError, build_ast, tokenize
 
 def main(
         source_file: Path,
-        bp_path: Optional[Path],
-        rp_path: Optional[Path],
         namespace: str,
 
+        bp_path: Optional[Path]=None,
+        rp_path: Optional[Path]=None,
         debug_log_tokens: bool=False,
         debug_log_ast: bool=False,
         debug_skip_packs_output: bool=False) -> None:

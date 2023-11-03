@@ -477,7 +477,7 @@ class AnimationTimeline:
                 run_once_actions = [
                     TimelineEventAction(
                         'command',
-                        f'execute @s[tag=!{run_once_id}] ~ ~ ~ '
+                        f'execute at @s[tag=!{run_once_id}] positioned ~ ~ ~ run '
                             f'{text_node.text}',
                         text_node.token.line_number)
                     for text_node in node.run_once_node.command_nodes

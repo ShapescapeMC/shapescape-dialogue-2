@@ -141,7 +141,7 @@ camera: interpolation_mode=1
             run_once:
                 /summon shapescape:obi_wan 1 2 3
             schedule: time=2.3
-                /execute @a[type=shapescape:clone] ~ ~ ~  function order_66
+                /execute at @a[type=shapescape:clone] positioned ~~~ run function order_66
             on_exit:
                 /event entity @e[type=shapescape:obi_wan] remove_high_ground
         tell: sound=obi_wan:hello.ogg
@@ -260,7 +260,7 @@ camera: interpolation_mode=1
             run_once:
                 /summon shapescape:obi_wan 1 2 3
             schedule: time=2.3
-                /execute @a[type=shapescape:clone] ~ ~ ~  function order_66
+                /execute at @a[type=shapescape:clone] positioned ~~~ run function order_66
             on_exit:
                 /event entity @e[type=shapescape:obi_wan] remove_high_ground
         tell: sound=obi_wan:hello.ogg
@@ -359,7 +359,7 @@ camera: interpolation_mode=1
             run_once:
                 /summon shapescape:obi_wan 1 2 3
             schedule: time=2.3
-                /execute @a[type=shapescape:clone] ~ ~ ~  function order_66
+                /execute at @a[type=shapescape:clone] positioned ~ ~ ~ run function order_66
             on_exit:
                 /event entity @e[type=shapescape:obi_wan] remove_high_ground
                 

@@ -347,7 +347,7 @@ class TimelineEventAction:
         elif self.action_type == "command":
             return self.value
         elif self.action_type == "playsound":
-            return f'playsound {sc_provider.get_sound_code(Path(self.value))} @a'
+            return f'execute at @a run playsound {sc_provider.get_sound_code(Path(self.value))} @a[r=10000] ~~~ 10000 1 10000'
         else:
             raise ValueError(f"Unknown action type: {self.action_type}")
 

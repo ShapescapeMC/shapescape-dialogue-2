@@ -1,3 +1,3 @@
 # Package version
-VERSION = (0, 7, 5)
+VERSION = (0, 8, 0)
 __version__ = '.'.join([str(x) for x in VERSION])

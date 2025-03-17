@@ -1,4 +1,4 @@
-settings: wpm=120 title_max=15
+settings: wpm=120
 camera: interpolation_mode=1
     1617 14 1482 facing 1625 19 1472
     1617 14 1482 facing 1633 3 1478
@@ -22,7 +22,7 @@ camera: interpolation_mode=1
         actionbar: 
             >§3The ringed seal on which she depends feed on fish, 90 meters below her feet
             loop: time=0.1
-                /execute @e[type=shapescape:seal_actor] ~~~ tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]
+                /execute at @e[type=shapescape:seal_actor] positioned ~~~ run tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]
         blank: time=2.8
             loop: time=0.1
-                /execute @e[type=shapescape:seal_actor] ~~~ tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]
+                /execute at @e[type=shapescape:seal_actor] positioned ~~~ run tp @s ^ ^ ^0.1 facing @e[type=shapescape:ai_goal,c=1]

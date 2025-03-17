@@ -459,8 +459,8 @@ class SettingsNode:
         settings = SettingsNode.parse_settings(
             tokens,
             accepted_settings={
-                "wpm": float, "cpm": float, "title_max": int,
-                "tp_selector": str, 'description': str}
+                "wpm": float, "cpm": float, "tp_selector": str,
+                'description': str}
         )
         return SettingsNode(settings, root_token)
 

@@ -1,4 +1,4 @@
-settings: wpm=120 title_max=15 tp_selector=@e[type=pig]
+settings: wpm=120 tp_selector=@e[type=pig]
 
 camera: tp_selector=@e[type=your_mom]
     1615 28 1136 0 0

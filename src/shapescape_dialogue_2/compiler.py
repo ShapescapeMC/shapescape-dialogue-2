@@ -148,7 +148,7 @@ class ConfigProvider:
         '''
         cursor: int = 0
         replace = []
-        insertion_pattern = re.compile(r"\{("+var_pattern+")\}")
+        insertion_pattern = re.compile(r"\{("+var_pattern+r")\}")
         while (
                 cursor < len(text) and
                 (match := insertion_pattern.search(text[cursor:]))):
